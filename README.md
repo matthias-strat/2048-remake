@@ -3,7 +3,7 @@ C++ remake of the popular puzzle game 2048
 
 **Dependencies**
 
-[SFML 2.2](http://www.sfml-dev.org/)
+[SFML 2.3.1](http://www.sfml-dev.org/download/sfml/2.3.1/)
 
 [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
 
