@@ -2,6 +2,10 @@
 
 // STL includes
 #include <memory>
+#include <map>
+#include <bitset>
+#include <functional>
+#include <array>
 
 // C includes
 #include <cassert>
