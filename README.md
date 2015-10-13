@@ -1,5 +1,6 @@
 # 2048-remake
 C++ (MSVC14) remake of the popular puzzle game 2048
+(Still uncomplete)
 
 **Dependencies**
 
