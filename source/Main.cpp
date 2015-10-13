@@ -15,7 +15,7 @@ bool ensureUserDirectory();
 
 int main()
 {
-	// Check is user directory if is existent, create it if not!
+	// Check if user directory is existent, create it if not!
 	if (!ensureUserDirectory())
 	{
 		std::cerr << "Failed to create user directory" << std::endl;
