@@ -147,7 +147,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.hpp" />
-    <ClInclude Include="include\Component.hpp" />
     <ClInclude Include="include\Components\GridComponent.hpp" />
     <ClInclude Include="include\Components\ScoreBoardComponent.hpp" />
     <ClInclude Include="include\Components\TileComponent.hpp" />
@@ -163,7 +162,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Application.cpp" />
-    <ClCompile Include="source\Component.cpp" />
     <ClCompile Include="source\Components\GridComponent.cpp" />
     <ClCompile Include="source\Components\ScoreBoardComponent.cpp" />
     <ClCompile Include="source\Components\TileComponent.cpp" />

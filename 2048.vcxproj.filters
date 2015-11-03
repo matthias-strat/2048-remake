@@ -50,9 +50,6 @@
     <ClInclude Include="include\StateStack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Component.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Components\GridComponent.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -104,9 +101,6 @@
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="source\Pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
