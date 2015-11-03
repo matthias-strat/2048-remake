@@ -1,5 +1,4 @@
 #pragma once
-#include <GameObject.hpp>
 
 class GridComponent
 {
@@ -11,7 +10,6 @@ public:
 	{
 		sf::Vector2i position;
 		sf::Vector2f worldPosition;
-		GameObject* gameObject;
 	};
 
 	explicit GridComponent(int numColumns = DefaultNumColumns, int numRows = DefaultNumRows);
@@ -20,6 +18,9 @@ public:
 	int getNumRows() const;
 
 	bool hasAvailableCells() const;
+
+private:
+	void initializeGrid();
 
 private:
 	int m_NumColumns;

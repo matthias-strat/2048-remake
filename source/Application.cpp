@@ -11,13 +11,14 @@ Application::Application(Configuration& config)
 	m_FpsCounterNum{ 0 }
 {
 	m_Fonts.load(Fonts::Verdana, "C:/Windows/Fonts/verdana.ttf");
+	m_Fonts.load(Fonts::Sansation, "assets/Sansation_Regular.ttf");
 
 	sf::Clock clock;
 	loadTextures();
 	auto elapsed{ clock.getElapsedTime() };
 	std::cout << "Application::ctor() -> loadTextures() took " << elapsed.asMilliseconds() << " ms" << std::endl;
 
-	m_FpsCounterText.setFont(m_Fonts.get(Fonts::Verdana));
+	m_FpsCounterText.setFont(m_Fonts.get(Fonts::Sansation));
 	m_FpsCounterText.setString("FPS: 0");
 	m_FpsCounterText.setPosition(3.f, 3.f);
 	m_FpsCounterText.setColor({ 119, 110, 101 });
@@ -128,4 +129,5 @@ void Application::loadTextures()
 	m_Textures.load(Textures::Grid, "assets/grid.png");
 	m_Textures.load(Textures::Menu, "assets/menu.png");
 	m_Textures.load(Textures::MenuButton, "assets/menu_button.png");
+	m_Textures.load(Textures::Scoreboard, "assets/scoreboard.png");
 }

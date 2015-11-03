@@ -18,6 +18,7 @@ private:
 	sf::Text m_HeaderText;
 	sf::Text m_SubHeaderText;
 	sf::Sprite m_GridSprite;
+	sf::Sprite m_ScoreboardSprite;
 	std::vector<std::unique_ptr<sf::Sprite>> m_Tiles;
 	sf::Vector2f m_Dest;
 	bool m_Done;

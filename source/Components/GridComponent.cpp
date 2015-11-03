@@ -8,7 +8,7 @@ GridComponent::GridComponent(int numColumns, int numRows)
 	: m_NumColumns{ numColumns },
 	m_NumRows{ numRows }
 {
-	
+	initializeGrid();
 }
 
 int GridComponent::getNumColumns() const
@@ -19,4 +19,9 @@ int GridComponent::getNumColumns() const
 int GridComponent::getNumRows() const
 {
 	return m_NumRows;
+}
+
+void GridComponent::initializeGrid()
+{
+
 }

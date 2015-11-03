@@ -22,11 +22,9 @@ bool GameState::update(sf::Time ft)
 			m_Tiles[0]->move(m_Velocity*ft.asSeconds());
 			return true;
 		}
-		else
-		{
-			m_Tiles[0]->setPosition(m_Dest);
-			m_Done = true;
-		}
+
+		m_Tiles[0]->setPosition(m_Dest);
+		m_Done = true;
 	}
 	return true;
 }
@@ -54,6 +52,7 @@ void GameState::draw()
 	window.draw(m_HeaderText);
 	window.draw(m_SubHeaderText);
 	window.draw(m_GridSprite);
+	window.draw(m_ScoreboardSprite);
 	for (const auto& tile : m_Tiles) window.draw(*tile.get());
 }
 
@@ -62,31 +61,34 @@ void GameState::buildScene()
 	static const sf::Color fontColor{ 119, 110, 101 };
 	const auto videoWidth{ getContext().config->getVideoWidth() };
 	const auto videoHeight{ getContext().config->getVideoHeight() };
-	const auto& font{ getContext().fonts->get(Fonts::Verdana) };
+	const auto& font{ getContext().fonts->get(Fonts::Sansation) };
 
 	m_HeaderText.setFont(font);
-	m_HeaderText.setCharacterSize(68u);
-	m_HeaderText.setString("2048 Puzzle");
-	m_HeaderText.setPosition(videoWidth / 2.f, 50.f);
-	auto bounds{ m_HeaderText.getLocalBounds() };
-	m_HeaderText.setOrigin(bounds.left + bounds.width / 2.f, 0.f);
+	m_HeaderText.setCharacterSize(50u);
+	m_HeaderText.setString("2048");
+	m_HeaderText.setPosition(videoWidth / 2.f - 480 / 2.f, 35.f);
+	//auto bounds{ m_HeaderText.getLocalBounds() };
+	//m_HeaderText.setOrigin(bounds.left + bounds.width / 2.f, 0.f);
 	m_HeaderText.setColor(fontColor);
 
 	m_SubHeaderText.setFont(font);
-	m_SubHeaderText.setCharacterSize(28u);
-	m_SubHeaderText.setString("A remake by Matthias Stratmann");
-	m_SubHeaderText.setPosition(videoWidth / 2.f, 130.f);
-	bounds = m_SubHeaderText.getLocalBounds();
-	m_SubHeaderText.setOrigin(bounds.left + bounds.width / 2.f, 0.f);
+	m_SubHeaderText.setCharacterSize(20u);
+	m_SubHeaderText.setString("A remake by\nMatthias Stratmann");
+	m_SubHeaderText.setPosition(videoWidth / 2.f - 480 / 2.f, 100.f);
+	//bounds = m_SubHeaderText.getLocalBounds();
+	//m_SubHeaderText.setOrigin(bounds.left + bounds.width / 2.f, 0.f);
 	m_SubHeaderText.setColor(fontColor);
 
 	m_GridSprite.setTexture(getContext().textures->get(Textures::Grid));
-	m_GridSprite.setPosition(videoWidth / 2.f, videoHeight / 2.f + 50.f);
+	m_GridSprite.setPosition(videoWidth / 2.f, videoHeight / 2.f + 40.f);
 	m_GridSprite.setOrigin(480 / 2.f, 480 / 2.f);
 
-	addTile(3, 0, 100, 200);
+	m_ScoreboardSprite.setTexture(getContext().textures->get(Textures::Scoreboard));
+	m_ScoreboardSprite.setPosition(videoWidth / 2.f + 480 / 2.f - 250.f, 45.f);
 
-	m_Dest = { videoWidth / 2.f - 480.f / 2.f + 16.f + (3 * 16.f) + (3 * 100.f), videoHeight / 2.f - 480.f / 2.f + 16.f + (3 * 16.f) + (3 * 100.f) + 50.f };
+	addTile(3, 0, 0, 200);
+
+	m_Dest = { videoWidth / 2.f - 480.f / 2.f + 16.f + (3 * 16.f) + (3 * 100.f), videoHeight / 2.f - 480.f / 2.f + 16.f + (3 * 16.f) + (3 * 100.f) + 40.f };
 	m_Velocity = m_Dest - m_Tiles[0]->getPosition();
 	m_Velocity.x *= 12.f;
 	m_Velocity.y *= 12.f;
@@ -99,6 +101,6 @@ void GameState::addTile(unsigned char slotX, unsigned char slotY, int texX, int 
 	auto sprite{ std::make_unique<sf::Sprite>() };
 	sprite->setTexture(getContext().textures->get(Textures::Tiles));
 	sprite->setTextureRect({ texX, texY, 100, 100 });
-	sprite->setPosition(videoWidth / 2.f - 480.f / 2.f + 16.f + (slotX*16.f) + (slotX*100.f), videoHeight / 2.f - 480.f / 2.f + 16.f + (slotY*16.f) + (slotY*100.f) + 50.f);
+	sprite->setPosition(videoWidth / 2.f - 480.f / 2.f + 16.f + (slotX*16.f) + (slotX*100.f), videoHeight / 2.f - 480.f / 2.f + 16.f + (slotY*16.f) + (slotY*100.f) + 40.f);
 	m_Tiles.emplace_back(std::move(sprite));
 }

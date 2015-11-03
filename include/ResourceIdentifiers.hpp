@@ -11,11 +11,13 @@ enum class Textures
 	MenuButton,
 	Tiles,
 	Grid,
+	Scoreboard,
 };
 
 enum class Fonts
 {
-	Verdana
+	Verdana,
+	Sansation
 };
 
 using FontHolder	= ResourceHolder<sf::Font, Fonts>;

@@ -152,7 +152,6 @@
     <ClInclude Include="include\Components\ScoreBoardComponent.hpp" />
     <ClInclude Include="include\Components\TileComponent.hpp" />
     <ClInclude Include="include\Configuration.hpp" />
-    <ClInclude Include="include\GameObject.hpp" />
     <ClInclude Include="include\ResourceHolder.hpp" />
     <ClInclude Include="include\ResourceIdentifiers.hpp" />
     <ClInclude Include="include\State.hpp" />
@@ -169,7 +168,6 @@
     <ClCompile Include="source\Components\ScoreBoardComponent.cpp" />
     <ClCompile Include="source\Components\TileComponent.cpp" />
     <ClCompile Include="source\Configuration.cpp" />
-    <ClCompile Include="source\GameObject.cpp" />
     <ClCompile Include="source\Main.cpp" />
     <ClCompile Include="source\State.cpp" />
     <ClCompile Include="source\StateStack.cpp" />
