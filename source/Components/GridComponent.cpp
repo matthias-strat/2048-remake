@@ -5,20 +5,20 @@ const int GridComponent::DefaultNumColumns{ 4 };
 const int GridComponent::DefaultNumRows{ 4 };
 
 GridComponent::GridComponent(int numColumns, int numRows)
-	: m_NumColumns{ numColumns },
-	m_NumRows{ numRows }
+    : m_NumColumns{ numColumns },
+    m_NumRows{ numRows }
 {
-	initializeGrid();
+    initializeGrid();
 }
 
 int GridComponent::getNumColumns() const
 {
-	return m_NumColumns;
+    return m_NumColumns;
 }
 
 int GridComponent::getNumRows() const
 {
-	return m_NumRows;
+    return m_NumRows;
 }
 
 void GridComponent::initializeGrid()

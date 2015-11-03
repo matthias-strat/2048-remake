@@ -8,27 +8,27 @@ const unsigned int Configuration::DefaultAntialiasing{ 0 };
 const bool Configuration::DefaultShowFps{ false };
 
 Configuration::Configuration(const std::string& filename)
-	: m_Filename{filename}
+    : m_Filename{filename}
 {
-	setDefaultValues(false);
+    setDefaultValues(false);
 }
 
 bool Configuration::load()
 {
-	return true;
+    return true;
 }
 
 bool Configuration::save()
 {
-	return true;
+    return true;
 }
 
 void Configuration::setDefaultValues(bool updated)
 {
-	m_VideoWidth = DefaultVideoWidth;
-	m_VideoHeight = DefaultVideoHeight;
-	m_VSync = DefaultVSync;
-	m_Antialiasing = DefaultAntialiasing;
-	m_ShowFps = DefaultShowFps;
-	if (updated) m_WasUpdated = true;
+    m_VideoWidth = DefaultVideoWidth;
+    m_VideoHeight = DefaultVideoHeight;
+    m_VSync = DefaultVSync;
+    m_Antialiasing = DefaultAntialiasing;
+    m_ShowFps = DefaultShowFps;
+    if (updated) m_WasUpdated = true;
 }

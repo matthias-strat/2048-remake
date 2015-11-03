@@ -6,19 +6,19 @@
 
 enum class Textures
 {
-	Resize,
-	Menu,
-	MenuButton,
-	Tiles,
-	Grid,
-	Scoreboard,
+    Resize,
+    Menu,
+    MenuButton,
+    Tiles,
+    Grid,
+    Scoreboard,
 };
 
 enum class Fonts
 {
-	Verdana,
-	Sansation
+    Verdana,
+    Sansation
 };
 
-using FontHolder	= ResourceHolder<sf::Font, Fonts>;
+using FontHolder    = ResourceHolder<sf::Font, Fonts>;
 using TextureHolder = ResourceHolder<sf::Texture, Textures>;
