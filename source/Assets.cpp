@@ -25,6 +25,16 @@ namespace
         r = multiplyDeBruijnBitPosition[v * 0x07C4ACDDU >> 27];
         return r;
     }
+
+    template <typename TFunc, typename... TArgs>
+    inline void measureFunction(const std::string& name, const TFunc& func, TArgs&&... args)
+    {
+        auto tp1(HRClock::now());
+        func(FWD(args)...);
+        auto tp2(HRClock::now());
+        auto elapsedMs(std::chrono::duration_cast<std::chrono::milliseconds>(tp2 - tp1).count());
+        std::cout << "Assets::" << name << "() took " << elapsedMs << " ms\n";
+    }
 }
 
 void Assets::load()
@@ -36,14 +46,8 @@ void Assets::load()
     txRoundedRect.loadFromMemory(pngRoundedRect, pngRoundedRectSize);
     txRoundedRectSmall.loadFromMemory(pngRoundedRectSmall, pngRoundedRectSmallSize);
 
-    // Generate textures based on screen size and grid size
-    createGridTexture();
-
-    auto tp1(HRClock::now());
-    createTileTextures();
-    auto tp2(HRClock::now());
-    auto elapsed(std::chrono::duration_cast<std::chrono::milliseconds>(tp2 - tp1).count());
-    std::cout << "Asssets::createTileTextures() took " << elapsed << " ms\n";
+    measureFunction("createGridTexture", [this]() { createGridTexture(); });
+    measureFunction("createTileTextures", [this]() { createTileTextures(); });
 }
 
 sf::IntRect Assets::getTileTextureRect(int v) const
@@ -54,12 +58,12 @@ sf::IntRect Assets::getTileTextureRect(int v) const
     auto exp(getLogBase2(v) - 1);
     auto x(exp % 5), y(exp / 5);
 
-    return sf::IntRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    return sf::IntRect(x * defaultTileSize, y * defaultTileSize, defaultTileSize, defaultTileSize);
 }
 
 void Assets::createGridTexture()
 {
-    auto size(((numTiles + 1) * spacing) + (numTiles * tileSize));
+    auto size(calculateGridSize(defaultNumCells, defaultTileSize, defaultSpacing));
     m_GridRender = std::make_unique<sf::RenderTexture>();
     m_GridRender->create(size, size);
 
@@ -73,21 +77,21 @@ void Assets::createGridTexture()
 
     // Draw cells
     np.setTexture(txRoundedRectSmall);
-    np.setSize({static_cast<float>(tileSize), static_cast<float>(tileSize)});
+    np.setSize({static_cast<float>(defaultTileSize), static_cast<float>(defaultTileSize)});
     np.setColor(colGridCell);
 
-    float xPos{spacing}, yPos{spacing};
-    for (auto x(0); x < numTiles; x++)
+    float xPos{defaultSpacing}, yPos{defaultSpacing};
+    for (auto x(0); x < defaultNumCells; x++)
     {
-        for (auto y(0); y < numTiles; y++)
+        for (auto y(0); y < defaultNumCells; y++)
         {
             np.setPosition(xPos, yPos);
             m_GridRender->draw(np);
-            yPos += tileSize + spacing;
+            yPos += defaultTileSize + defaultSpacing;
         }
 
-        xPos += tileSize + spacing;
-        yPos = spacing;
+        xPos += defaultTileSize + defaultSpacing;
+        yPos = defaultSpacing;
     }
 
     m_GridRender->display();
@@ -97,7 +101,7 @@ void Assets::createGridTexture()
 
 void Assets::createTileTextures()
 {
-    auto width(5 * tileSize), height(4 * tileSize);
+    auto width(5 * defaultTileSize), height(4 * defaultTileSize);
 
     m_TileRender = std::make_unique<sf::RenderTexture>();
     m_TileRender->create(width, height);
@@ -107,7 +111,7 @@ void Assets::createTileTextures()
     states.blendMode = sf::BlendNone;
 
     // Generate tile texture based on tilesize (for values 2 to 524288)
-    NinePatch np{txRoundedRectSmall,{static_cast<float>(tileSize), static_cast<float>(tileSize)}};
+    NinePatch np{txRoundedRectSmall,{static_cast<float>(defaultTileSize), static_cast<float>(defaultTileSize)}};
     sf::Text text;
     text.setFont(fntArialBlack);
 
@@ -117,7 +121,9 @@ void Assets::createTileTextures()
         np.setPosition(x, y);
         np.setColor(colTiles[j - 1]);
 
-        text.setColor(colTilesFont[j - 1]);
+        text.setFillColor(colTilesFont[j - 1]);
+        text.setCharacterSize(45);
+        text.setString(std::to_string(i));
 
         // Decrease font size based on the number of digits (TODO: rework font size calculation)
         auto fontSize(45);
@@ -142,10 +148,10 @@ void Assets::createTileTextures()
 
         text.setCharacterSize(fontSize);
 
-        text.setString(std::to_string(i));
         auto bounds(text.getLocalBounds());
-        text.setOrigin(static_cast<int>(bounds.left + bounds.width / 2.f), static_cast<int>(bounds.top + bounds.height / 2.f));
-        text.setPosition(x + tileSize / 2.f, y + tileSize / 2.f);
+        text.setOrigin(static_cast<float>(static_cast<int>(bounds.left + bounds.width / 2.f)), 
+                       static_cast<float>(static_cast<int>(bounds.top + bounds.height / 2.f)));
+        text.setPosition(x + defaultTileSize / 2.f, y + defaultTileSize / 2.f);
 
         m_TileRender->draw(np, states);
         m_TileRender->draw(text);
@@ -154,10 +160,10 @@ void Assets::createTileTextures()
         {
             // next row in tileset
             x = 0.f;
-            y += tileSize;
+            y += defaultTileSize;
         }
         else
-            x += tileSize;
+            x += defaultTileSize;
     }
 
     m_TileRender->display();

@@ -1,17 +1,19 @@
 #include "GameBase.hpp"
 
-GameBase::GameBase(const std::string& windowTitle, unsigned windowWidth, unsigned windowHeight) noexcept
-    : m_Window{{windowWidth, windowHeight}, windowTitle, sf::Style::Close},
+GameBase::GameBase(const std::string& windowTitle, unsigned int windowWidth, unsigned int windowHeight) noexcept
+    : m_WindowTitle{windowTitle},
       m_WindowWidth{windowWidth},
       m_WindowHeight{windowHeight}
 {
-    m_Window.setVerticalSyncEnabled(true);
 }
 
 void GameBase::run()
 {
     safeInvoke(onLoadContent);
     safeInvoke(onFpsUpdated, 0);
+
+    m_Window.create({ m_WindowWidth, m_WindowHeight }, m_WindowTitle, sf::Style::Default);
+    m_Window.setVerticalSyncEnabled(true);
 
     // Integrate at 60Hz
     static const auto timeStep(sf::seconds(1.f / 60.f));
@@ -28,6 +30,11 @@ void GameBase::run()
         while (m_Window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed) m_Window.close();
+            if (event.type == sf::Event::Resized)
+            {
+                m_WindowWidth = event.size.width;
+                m_WindowHeight = event.size.height;
+            }
             safeInvoke(onEvent, event);
         }
 

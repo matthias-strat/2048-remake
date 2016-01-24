@@ -1,12 +1,15 @@
 #pragma once
 
 class TileManager;
+class Assets;
 
-class Tile
+class Tile : public sf::Drawable, public sf::Transformable
 {
     friend class TileManager;
 
 public:
+    explicit Tile(Assets& assets) noexcept;
+
     bool getIsAlive() const noexcept;
     void destroy() noexcept;
 
@@ -14,6 +17,14 @@ public:
     int increaseValue() noexcept;
 
 private:
+    void update(float ft);
+    void updateTexture() noexcept;
+
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
+private:
+    Assets& m_Assets;
     bool m_IsAlive{false};
     int m_Value{2};
+    sf::Vertex m_Vertices[4];
 };

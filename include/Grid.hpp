@@ -1,6 +1,8 @@
 #pragma once
 #include "Common.hpp"
 
+class Tile;
+
 // Represents the ingame grid. This class combines both draw and game logic (is this a bad approach?)
 class Grid : public sf::Drawable, public sf::Transformable
 {
@@ -10,6 +12,9 @@ public:
     {
         // A value indicating whether this cell is empty.
         bool isEmpty{true};
+
+        // Gets the associated tile.
+        Tile* tile{nullptr};
 
         // The position of the cell in the grid.
         Vec2u position;

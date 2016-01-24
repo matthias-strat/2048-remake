@@ -38,6 +38,7 @@ private:
 
 private:
     sf::RenderWindow m_Window;
+    std::string m_WindowTitle;
     unsigned int m_WindowWidth, m_WindowHeight;
 
     sf::Color m_ClearColor{sf::Color::White};

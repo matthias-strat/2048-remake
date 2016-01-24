@@ -21,6 +21,8 @@ private:
     void onFpsUpdated(int fps);
     void onDraw(sf::RenderTarget& target);
 
+    void onResize(unsigned int width, unsigned int height);
+
 private:
     GameBase m_Game;
     sf::RenderWindow& m_Window;

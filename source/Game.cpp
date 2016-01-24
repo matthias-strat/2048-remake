@@ -47,6 +47,7 @@ void Game::onLoadContent()
 
 void Game::onEvent(const sf::Event& event)
 {
+    if (event.type == sf::Event::Resized) onResize(event.size.width, event.size.height);
 }
 
 void Game::onUpdateFixed(float ft)
@@ -64,4 +65,13 @@ void Game::onFpsUpdated(int fps)
 void Game::onDraw(sf::RenderTarget& target)
 {
     m_Window.draw(m_Grid);
+}
+
+void Game::onResize(unsigned width, unsigned height)
+{
+    // Fix view
+    m_Window.setView(sf::View{{0.f, 0.f, static_cast<float>(width), static_cast<float>(height)}});
+
+    // Center grid again
+    m_Grid.setPosition(static_cast<float>(width/2), static_cast<float>(height/2));
 }
