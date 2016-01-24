@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Assets.hpp"
 #include "NinePatch.hpp"
 #include "Embedded.hpp"
