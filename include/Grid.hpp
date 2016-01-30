@@ -32,6 +32,8 @@ public:
 
     void setTexture(const sf::Texture& texture) noexcept;
 
+    const Cell& getCellAt(int index) const noexcept;
+
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
     void updateVertices();

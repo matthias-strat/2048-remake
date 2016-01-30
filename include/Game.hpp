@@ -3,6 +3,7 @@
 #include "GameBase.hpp"
 #include "Assets.hpp"
 #include "Grid.hpp"
+#include "Tile.hpp"
 
 class Game
 {
@@ -25,8 +26,10 @@ private:
 
 private:
     GameBase m_Game;
+    Config m_Config;
     sf::RenderWindow& m_Window;
     Assets m_Assets;
 
     Grid m_Grid;
+    Tile m_TestTile;
 };

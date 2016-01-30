@@ -37,10 +37,16 @@ namespace
     }
 }
 
+Assets::Assets(Config& config)
+    : m_Config{config}
+{
+}
+
 void Assets::load()
 {
     // Load fonts
-    fntArialBlack.loadFromFile("C:/windows/Fonts/ariblk.ttf");
+    fntCode.loadFromFile("assets/codebd.otf");
+    fntSansation.loadFromFile("assets/sansation.ttf");
 
     // Load nine-patch assets from embedded memory.
     txRoundedRect.loadFromMemory(pngRoundedRect, pngRoundedRectSize);
@@ -113,7 +119,7 @@ void Assets::createTileTextures()
     // Generate tile texture based on tilesize (for values 2 to 524288)
     NinePatch np{txRoundedRectSmall,{static_cast<float>(defaultTileSize), static_cast<float>(defaultTileSize)}};
     sf::Text text;
-    text.setFont(fntArialBlack);
+    text.setFont(fntCode);
 
     auto x(0.f), y(0.f);
     for (auto i(2), j(1); i <= 524288; i *= 2 , j++)

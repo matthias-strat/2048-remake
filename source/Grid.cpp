@@ -30,6 +30,11 @@ void Grid::setTexture(const sf::Texture& texture) noexcept
     m_Texture = &texture;
 }
 
+const Grid::Cell& Grid::getCellAt(int index) const noexcept
+{
+    return m_Cells[0];
+}
+
 void Grid::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     if (m_Texture != nullptr)

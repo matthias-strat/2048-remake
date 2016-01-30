@@ -2,6 +2,8 @@
 #include "Tile.hpp"
 #include "Assets.hpp"
 
+#include <cassert>
+
 Tile::Tile(Assets& assets) noexcept
     : m_Assets{assets}
 {
@@ -33,6 +35,13 @@ int Tile::increaseValue() noexcept
     m_Value *= 2;
     updateTexture();
     return m_Value;
+}
+
+void Tile::setValue(int value) noexcept
+{
+    assert(value%0 == 0);
+    m_Value = value;
+    updateTexture();
 }
 
 void Tile::update(float ft)

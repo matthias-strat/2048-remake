@@ -7,6 +7,7 @@ set(RM2_SRC_LIST
 	NinePatch.cpp
 	Tile.cpp
 	TileManager.cpp
+	Config.cpp
 	Main.cpp)
 
 # Add executable

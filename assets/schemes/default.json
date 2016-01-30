@@ -1,0 +1,26 @@
+{
+    // The default and original look of the game
+    
+    // Will be displayed in-game
+    "name": "Default",
+
+    // The font file
+    "font": "assets/codebd.otf",
+
+    // Background color of the window
+    "col_window": "0, 0, 0",
+
+    // Background color of the grid
+    "col_grid": "0, 0, 0",
+
+    // Background color of grid cells
+    "col_grid_cell": "0, 0, 0",
+
+    // Tile colors
+    "col_tiles": [
+    ],
+
+    // Tile font colors
+    "col_tiles_font": [
+    ]
+}

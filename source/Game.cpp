@@ -2,7 +2,9 @@
 
 Game::Game()
     : m_Game{"2048", windowWidth, windowHeight},
-      m_Window{m_Game.getWindow()}
+      m_Window{m_Game.getWindow()},
+      m_Assets{m_Config},
+      m_TestTile{m_Assets}
 {
     m_Game.onLoadContent = [this]()
         {
@@ -43,6 +45,11 @@ void Game::onLoadContent()
     m_Grid.setTexture(*m_Assets.txGrid);
     m_Grid.setPosition(windowWidth / 2.f, windowHeight / 2.f);
     m_Grid.setOrigin(m_Grid.getSize() / 2.f, m_Grid.getSize() / 2.f);
+
+    auto posX(defaultWindowWidth/2-defaultGridSize/2+defaultSpacing);
+    auto posY(defaultWindowHeight/2-defaultGridSize/2+defaultSpacing);
+    m_TestTile.setPosition(posX, posY);
+    m_TestTile.increaseValue();
 }
 
 void Game::onEvent(const sf::Event& event)
@@ -65,6 +72,7 @@ void Game::onFpsUpdated(int fps)
 void Game::onDraw(sf::RenderTarget& target)
 {
     m_Window.draw(m_Grid);
+    m_Window.draw(m_TestTile);
 }
 
 void Game::onResize(unsigned width, unsigned height)

@@ -15,6 +15,7 @@ public:
 
     int getValue() const noexcept;
     int increaseValue() noexcept;
+    void setValue(int value) noexcept;
 
 private:
     void update(float ft);
