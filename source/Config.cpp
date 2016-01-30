@@ -1,4 +1,5 @@
 #include "Config.hpp"
+#include <json/json.h>
 
 unsigned int Config::getWindowWidth() const noexcept { return m_WindowWidth; }
 unsigned int Config::getWindowHeight() const noexcept { return m_WindowHeight; }

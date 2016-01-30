@@ -8,10 +8,10 @@
     "font": "assets/codebd.otf",
 
     // Background color of the window
-    "col_window": "0, 0, 0",
+    "col_window": "250, 248, 239",
 
     // Background color of the grid
-    "col_grid": "0, 0, 0",
+    "col_grid": "187, 173, 160",
 
     // Background color of grid cells
     "col_grid_cell": "0, 0, 0",

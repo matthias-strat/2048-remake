@@ -27,7 +27,7 @@ endif()
 set(RM2_SFML_SHARED_LIBS TRUE CACHE BOOL "Link SFML dynamically?")
 
 # Add custom CMake submodules to module path
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules;${CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake/modules;${CMAKE_MODULE_PATH}")
 
 # Find SFML
 if(NOT RM2_SFML_SHARED_LIBS)
@@ -50,6 +50,20 @@ endmacro()
 
 macro(rm2_link_sfml_dependencies RM2_TARGET)
 	target_link_libraries(${RM2_TARGET} ${SFML_DEPENDENCIES})
+endmacro()
+
+# Find Jsoncpp
+find_package(Jsoncpp)
+
+if (JSONCPP_FOUND)
+	include_directories(${JSONCPP_INCLUDE_DIR})
+else()
+	
+endif()
+
+# Macro to link jsoncpp
+macro(rm2_link_jsoncpp RM2_TARGET)
+	target_link_libraries(${RM2_TARGET} ${JSONCPP_LIBRARIES})
 endmacro()
 
 # Source code

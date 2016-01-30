@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "Easing.hpp"
 
 Game::Game()
     : m_Game{"2048", windowWidth, windowHeight},
@@ -46,9 +47,10 @@ void Game::onLoadContent()
     m_Grid.setPosition(windowWidth / 2.f, windowHeight / 2.f);
     m_Grid.setOrigin(m_Grid.getSize() / 2.f, m_Grid.getSize() / 2.f);
 
-    auto posX(defaultWindowWidth/2-defaultGridSize/2+defaultSpacing);
-    auto posY(defaultWindowHeight/2-defaultGridSize/2+defaultSpacing);
+    auto posX(defaultWindowWidth/2-defaultGridSize/2+defaultSpacing+defaultTileSize/2.f);
+    auto posY(defaultWindowHeight/2-defaultGridSize/2+defaultSpacing+defaultTileSize/2.f);
     m_TestTile.setPosition(posX, posY);
+    m_TestTile.setOrigin(defaultTileSize/2.f, defaultTileSize/2.f);
     m_TestTile.increaseValue();
 }
 

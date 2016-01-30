@@ -20,6 +20,9 @@ if(NOT RM2_SFML_SHARED_LIBS)
 	rm2_link_sfml_dependencies(${PROJECT_NAME})
 endif()
 
+# Link jsoncpp
+rm2_link_jsoncpp(${PROJECT_NAME})
+
 set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX -d)
 set_target_properties(${PROJECT_NAME}
 	PROPERTIES

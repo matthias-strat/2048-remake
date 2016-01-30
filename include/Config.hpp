@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 // Simple configuration class.
 class Config
@@ -10,6 +11,9 @@ public:
     inline unsigned int getFullscreenWidth() const noexcept;
     inline unsigned int getFullscreenHeight() const noexcept;
     inline bool getFullscreen() const noexcept;
+
+    void loadFromJson(const std::string& json);
+    std::string saveToJson();
 
 private:
     unsigned int m_WindowWidth, m_WindowHeight;

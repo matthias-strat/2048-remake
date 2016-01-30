@@ -32,4 +32,5 @@ private:
 
     Grid m_Grid;
     Tile m_TestTile;
+    float m_Test{0.f};
 };
