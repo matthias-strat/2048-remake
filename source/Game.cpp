@@ -5,7 +5,8 @@ Game::Game()
     : m_Game{"2048", windowWidth, windowHeight},
       m_Window{m_Game.getWindow()},
       m_Assets{m_Config},
-      m_TestTile{m_Assets}
+      m_TestTile{m_Assets},
+      m_TestTile2{m_Assets}
 {
     m_Game.onLoadContent = [this]()
         {
@@ -51,12 +52,21 @@ void Game::onLoadContent()
     auto posY(defaultWindowHeight/2-defaultGridSize/2+defaultSpacing+defaultTileSize/2.f);
     m_TestTile.setPosition(posX, posY);
     m_TestTile.setOrigin(defaultTileSize/2.f, defaultTileSize/2.f);
-    m_TestTile.increaseValue();
+    //m_TestTile.increaseValue();
+    //m_TestTile.setValue(64);
+
+    m_TestTile2.setPosition(posX + defaultSpacing + defaultTileSize, posY + defaultSpacing * 2 + defaultTileSize*2);
+    m_TestTile2.setOrigin(defaultTileSize/2.f, defaultTileSize/2.f);
+    m_TestTile2.setValue(4096);    
 }
 
 void Game::onEvent(const sf::Event& event)
 {
     if (event.type == sf::Event::Resized) onResize(event.size.width, event.size.height);
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::I)
+    {
+        m_TestTile.increaseValue();
+    }
 }
 
 void Game::onUpdateFixed(float ft)
@@ -75,6 +85,7 @@ void Game::onDraw(sf::RenderTarget& target)
 {
     m_Window.draw(m_Grid);
     m_Window.draw(m_TestTile);
+    m_Window.draw(m_TestTile2);
 }
 
 void Game::onResize(unsigned width, unsigned height)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 #include <array>
 #include "Aliases.hpp"
 
@@ -18,6 +19,16 @@ constexpr unsigned int defaultSpacing{14}; // Default spacing between the cells 
 constexpr unsigned int defaultTileSize{110}; // Default size of the cells and tiles (in pixels)
 constexpr float defaultVelMult{1.f}; // Default velocity multiplier when moving tiles.
 
+// Directory constants
+const std::string fontDirectory{"assets/fonts"};
+const std::string schemeDirectory{"assets/schemes"};
+
+// Configuration file path
+const std::string configFile{"save/config.json"};
+
+// Default scheme file
+const std::string defaultScheme{"default.json"};
+
 template <typename T1, typename T2, typename T3>
 inline constexpr Common<T1, T2, T3> calculateGridSize(T1 numCells, T2 cellSize, T3 spacing)
 {
@@ -29,4 +40,21 @@ constexpr float defaultGridSize{static_cast<float>(calculateGridSize(defaultNumC
 inline constexpr int get1DIndexFrom2D(int x, int y, int width) noexcept
 {
     return y + x * width;
+}
+
+inline sf::Color toColor(const std::string& str) noexcept
+{
+    using namespace std;
+
+    sf::Color color{0, 0, 0, 255};
+
+    string parsed;
+    stringstream stream(str);
+
+    if (getline(stream, parsed, ',')) color.r = stoi(parsed);
+    if (getline(stream, parsed, ',')) color.g = stoi(parsed);
+    if (getline(stream, parsed, ',')) color.b = stoi(parsed);
+    if (getline(stream, parsed, ',')) color.a = stoi(parsed);
+
+    return color;
 }

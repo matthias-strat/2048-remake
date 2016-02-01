@@ -31,6 +31,6 @@ private:
     Assets m_Assets;
 
     Grid m_Grid;
-    Tile m_TestTile;
+    Tile m_TestTile, m_TestTile2;
     float m_Test{0.f};
 };

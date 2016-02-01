@@ -1,22 +1,21 @@
 #pragma once
-#include <string>
+
+#include <json/json.h>
+#include "Common.hpp"
 
 // Simple configuration class.
 class Config
 {
 public:
+    unsigned int getWindowWidth() const noexcept;
+    unsigned int getWindowHeight() const noexcept;
+    std::string getSchemeFile() const noexcept;
 
-    inline unsigned int getWindowWidth() const noexcept;
-    inline unsigned int getWindowHeight() const noexcept;
-    inline unsigned int getFullscreenWidth() const noexcept;
-    inline unsigned int getFullscreenHeight() const noexcept;
-    inline bool getFullscreen() const noexcept;
-
-    void loadFromJson(const std::string& json);
+    void loadFromJson(Json::Value& root);
     std::string saveToJson();
 
 private:
-    unsigned int m_WindowWidth, m_WindowHeight;
-    unsigned int m_FullscreenWidth, m_FullscreenHeight;
-    bool m_Fullscreen;
+    unsigned int m_WindowWidth{defaultWindowWidth};
+    unsigned int m_WindowHeight{defaultWindowHeight};
+    std::string m_SchemeFile{defaultScheme};
 };
