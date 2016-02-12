@@ -3,6 +3,9 @@
 #include <iostream>
 #include <sstream>
 #include <array>
+#include <random>
+#include <chrono>
+
 #include "Aliases.hpp"
 
 #include <SFML/Graphics.hpp>
@@ -57,4 +60,11 @@ inline sf::Color toColor(const std::string& str) noexcept
     if (getline(stream, parsed, ',')) color.a = stoi(parsed);
 
     return color;
+}
+
+// Sets the components of a vector to zero.
+template <typename T>
+inline void nullify(Vec2<T>& vec) noexcept
+{
+    vec.x = vec.y = T(0);
 }

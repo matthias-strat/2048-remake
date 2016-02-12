@@ -14,6 +14,7 @@ void GameBase::run()
 
     m_Window.create({ m_WindowWidth, m_WindowHeight }, m_WindowTitle, sf::Style::Default);
     m_Window.setVerticalSyncEnabled(true);
+    m_Window.setKeyRepeatEnabled(false);
 
     // Integrate at 60Hz
     static const auto timeStep(sf::seconds(1.f / 60.f));

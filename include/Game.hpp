@@ -24,13 +24,18 @@ private:
 
     void onResize(unsigned int width, unsigned int height);
 
+    void restart();
+
 private:
     GameBase m_Game;
     Config m_Config;
     sf::RenderWindow& m_Window;
     Assets m_Assets;
 
+    bool m_Restart{false};
+
+    Vec2i m_MoveDirection{0, 0};
+
     Grid m_Grid;
     Tile m_TestTile, m_TestTile2;
-    float m_Test{0.f};
 };

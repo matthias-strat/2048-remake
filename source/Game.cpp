@@ -63,17 +63,47 @@ void Game::onLoadContent()
 void Game::onEvent(const sf::Event& event)
 {
     if (event.type == sf::Event::Resized) onResize(event.size.width, event.size.height);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::I)
+
+    if (event.type == sf::Event::KeyPressed)
     {
-        m_TestTile.increaseValue();
+        using k = sf::Keyboard::Key;
+        
+        // Vertical movement
+        if (event.key.code == k::W || event.key.code == k::Up)
+            m_MoveDirection.y = 1;
+        else if (event.key.code == k::S || event.key.code == k::Down)
+            m_MoveDirection.y = -1;
+
+        // Horizontal movement
+        if (event.key.code == k::D || event.key.code == k::Right)
+            m_MoveDirection.x = 1;
+        else if (event.key.code == k::A || event.key.code == k::Left)
+            m_MoveDirection.x = -1;
+
+        // Restart game
+        if (event.key.code == k::R) m_Restart = true;
     }
+
 }
 
 void Game::onUpdateFixed(float ft)
 {
+    // Restart the game if requested.
+    if (m_Restart)
+    {
+        restart();
+        m_Restart = false;
+    }
+
+    // Check if we have to move tiles
+    if (m_MoveDirection.x != 0 || m_MoveDirection.y != 0)
+    {
+
+        nullify(m_MoveDirection);
+    }
 }
 
-void Game::onUpdateVariable(float ft)
+void Game::onUpdateVariable(float dt)
 {
 }
 
@@ -95,4 +125,9 @@ void Game::onResize(unsigned width, unsigned height)
 
     // Center grid again
     m_Grid.setPosition(static_cast<float>(width/2), static_cast<float>(height/2));
+}
+
+void Game::restart()
+{
+    std::cout << "Game::restart()\n";
 }
