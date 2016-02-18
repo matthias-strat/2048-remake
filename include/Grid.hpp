@@ -3,46 +3,41 @@
 
 class Tile;
 
-// Represents the ingame grid. This class combines both draw and game logic (is this a bad approach?)
-class Grid : public sf::Drawable, public sf::Transformable
+// Implements the logic for the game grid.
+class Grid
 {
 public:
-    // Represents a cell inside a grid.
-    struct Cell
-    {
-        // A value indicating whether this cell is empty.
-        bool isEmpty{true};
-
-        // Gets the associated tile.
-        Tile* tile{nullptr};
-
-        // The position of the cell in the grid.
-        Vec2u position;
-
-        // The position of the cell in the world (render position)
-        Vec2f worldPosition;
-    };
-
-public:
-    explicit Grid(unsigned int numCells = defaultNumCells, unsigned int tileSize = defaultTileSize, unsigned int spacing = defaultSpacing) noexcept;
+    explicit Grid(unsigned int numCells = defaultNumCells) noexcept;
     Grid(const Grid&) = delete;
     Grid& operator=(const Grid&) = delete;
 
-    float getSize() const noexcept;
+    void clear() noexcept;
+    void resize(unsigned int numCells) noexcept;
+    void rotate(int times = 1) noexcept;
 
-    void setTexture(const sf::Texture& texture) noexcept;
+    bool isWithinBounds(const Vec2u& pos) const noexcept;
+    bool isWithinBounds(unsigned int col, unsigned int row) const noexcept;
 
-    const Cell& getCellAt(int index) const noexcept;
+    void getFreeCells(std::vector<Vec2u>& freeCells) const noexcept;
+    bool hasFreeCells() const noexcept;
+
+    int getCell(const Vec2u& pos) const noexcept;
+    int getCell(unsigned int col, unsigned int row) const noexcept;
+
+    bool isCellEmpty(unsigned int col, unsigned int row) const noexcept;
+    bool hasAnyValueInColumn(int col, int startRow) const noexcept;
+
+    void setCell(const Vec2u& pos, int value) noexcept;
+    void setCell(unsigned int col, unsigned int row, int value) noexcept;
+
+    void increaseCell(unsigned int col, unsigned int row) noexcept;
+
+    unsigned int getNumCells() const noexcept;
+
+    void print();
 
 private:
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-    void updateVertices();
+    unsigned int m_NumCells;
 
-private:
-    unsigned int m_NumCells, m_TileSize, m_Spacing;
-    float m_Size;
-
-    sf::Vertex m_Vertices[4];
-    const sf::Texture* m_Texture{nullptr};
-    std::vector<Cell> m_Cells;
+    std::vector<std::vector<int>> m_Cells;
 };

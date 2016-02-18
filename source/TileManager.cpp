@@ -10,8 +10,10 @@ TileManager::TileManager(Assets& assets)
     }
 }
 
-Tile& TileManager::create(int value)
+Tile& TileManager::create(const Vec2u& gridPos, int value)
 {
+    auto worldPos(gridPosToWorldPos(gridPos));
+
     return *m_Tiles[0];
 }
 
@@ -30,4 +32,9 @@ void TileManager::draw(sf::RenderTarget& target)
         if (!t->getIsAlive()) continue;
         target.draw(*t);
     }
+}
+
+Vec2f TileManager::gridPosToWorldPos(const Vec2u& gridPos) noexcept
+{
+    return {0.f, 0.f};
 }

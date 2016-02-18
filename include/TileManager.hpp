@@ -10,7 +10,10 @@ public:
     void update(float ft);
     void draw(sf::RenderTarget& target);
 
-    Tile& create(int value);
+    Tile& create(const Vec2u& gridPos, int value);
+
+private:
+    Vec2f gridPosToWorldPos(const Vec2u& gridPos) noexcept;
 
 private:
     std::vector<UPtr<Tile>> m_Tiles;

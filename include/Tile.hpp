@@ -3,6 +3,7 @@
 class TileManager;
 class Assets;
 
+// Represents the drawable puzzle tile, this class just handles draw logic.
 class Tile : public sf::Drawable, public sf::Transformable
 {
     friend class TileManager;

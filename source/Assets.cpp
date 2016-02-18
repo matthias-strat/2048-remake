@@ -25,16 +25,6 @@ namespace
         r = multiplyDeBruijnBitPosition[v * 0x07C4ACDDU >> 27];
         return r;
     }
-
-    template <typename TFunc, typename... TArgs>
-    inline void measureFunction(const std::string& name, const TFunc& func, TArgs&&... args)
-    {
-        auto tp1(HRClock::now());
-        func(FWD(args)...);
-        auto tp2(HRClock::now());
-        auto elapsedMs(std::chrono::duration_cast<std::chrono::milliseconds>(tp2 - tp1).count());
-        std::cout << "Assets::" << name << "() took " << elapsedMs << " ms\n";
-    }
 }
 
 Assets::Assets(Config& config)
@@ -52,8 +42,8 @@ void Assets::load()
     txRoundedRect.loadFromMemory(pngRoundedRect, pngRoundedRectSize);
     txRoundedRectSmall.loadFromMemory(pngRoundedRectSmall, pngRoundedRectSmallSize);
 
-    measureFunction("createGridTexture", [this]() { createGridTexture(); });
-    measureFunction("createTileTextures", [this]() { createTileTextures(); });
+    measureFunction("Assets::createGridTexture", [this]() { createGridTexture(); });
+    measureFunction("Assets::createTileTextures", [this]() { createTileTextures(); });
 }
 
 sf::IntRect Assets::getTileTextureRect(int v) const

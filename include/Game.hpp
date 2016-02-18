@@ -5,6 +5,8 @@
 #include "Grid.hpp"
 #include "Tile.hpp"
 
+#include <queue>
+
 class Game
 {
 public:
@@ -26,6 +28,12 @@ private:
 
     void restart();
 
+    void addRandomTile();
+    void addStartTiles();
+
+    int moveTilesUp();
+    void moveTiles();
+
 private:
     GameBase m_Game;
     Config m_Config;
@@ -34,8 +42,9 @@ private:
 
     bool m_Restart{false};
 
-    Vec2i m_MoveDirection{0, 0};
+    MoveDirection m_MoveDirection{MoveNone};
 
     Grid m_Grid;
+    sf::Sprite m_GridSprite;
     Tile m_TestTile, m_TestTile2;
 };
