@@ -17,8 +17,7 @@ Game::Game()
     : m_Game{"2048", windowWidth, windowHeight},
       m_Window{m_Game.getWindow()},
       m_Assets{m_Config},
-      m_TestTile{m_Assets},
-      m_TestTile2{m_Assets}
+      m_TileMgr{m_Assets, m_Grid.getSize()}
 {
     m_Game.onLoadContent = [this]()
         {
@@ -28,13 +27,9 @@ Game::Game()
         {
             onEvent(e);
         };
-    m_Game.onUpdateFixed = [this](float ft)
+    m_Game.onUpdate = [this](float dt)
         {
-            onUpdateFixed(ft);
-        };
-    m_Game.onUpdateVariable = [this](float dt)
-        {
-            onUpdateVariable(dt);
+            onUpdate(dt);
         };
     m_Game.onFpsUpdated = [this](int fps)
         {
@@ -44,6 +39,7 @@ Game::Game()
         {
             onDraw(target);
         };
+    m_Game.setCursorVisible(false);
 }
 
 void Game::run()
@@ -56,20 +52,11 @@ void Game::onLoadContent()
     m_Assets.load();
     m_Game.setClearColor(m_Assets.colBackground);
 
+    m_CursorSprite.setTexture(m_Assets.txCursor);
+
     m_GridSprite.setTexture(*m_Assets.txGrid);
     m_GridSprite.setPosition(windowWidth/2.f, windowHeight/2.f);
     m_GridSprite.setOrigin(defaultGridSize/2.f, defaultGridSize/2.f);
-
-    auto posX(defaultWindowWidth/2-defaultGridSize/2+defaultSpacing+defaultTileSize/2.f);
-    auto posY(defaultWindowHeight/2-defaultGridSize/2+defaultSpacing+defaultTileSize/2.f);
-    m_TestTile.setPosition(posX, posY);
-    m_TestTile.setOrigin(defaultTileSize/2.f, defaultTileSize/2.f);
-    //m_TestTile.increaseValue();
-    //m_TestTile.setValue(64);
-
-    m_TestTile2.setPosition(posX + defaultSpacing + defaultTileSize, posY + defaultSpacing * 2 + defaultTileSize*2);
-    m_TestTile2.setOrigin(defaultTileSize/2.f, defaultTileSize/2.f);
-    m_TestTile2.setValue(4096);
 
     restart();
 }
@@ -84,42 +71,68 @@ void Game::onEvent(const sf::Event& event)
         
         // Vertical movement
         if (event.key.code == k::W || event.key.code == k::Up)
-            m_MoveDirection = MoveUp;
+            m_MoveDirection = {0, -1};
         else if (event.key.code == k::S || event.key.code == k::Down)
-            m_MoveDirection = MoveDown;
+            m_MoveDirection = {0, 1};
 
         // Horizontal movement
         if (event.key.code == k::D || event.key.code == k::Right)
-            m_MoveDirection = MoveRight;
+            m_MoveDirection = {1, 0};
         else if (event.key.code == k::A || event.key.code == k::Left)
-            m_MoveDirection = MoveLeft;
+            m_MoveDirection = {-1, 0};
 
         // Restart game
         if (event.key.code == k::R) m_Restart = true;
+
+        if (event.key.code == k::Space) 
+        {
+            m_GridMoving = true;
+            m_Grid.clear();
+            m_TileMgr.clear();
+        }
     }
 
 }
 
-void Game::onUpdateFixed(float ft)
+void Game::onUpdate(float dt)
 {
-    // Restart the game if requested.
-    if (m_Restart)
+    if (m_GridMoving)
     {
-        restart();
-        m_Restart = false;
+        Vec2f start{defaultWindowWidth/2.f, defaultWindowHeight/2.f};
+        Vec2f end{start*3.f};
+
+        auto x(easing::Back<float>::in(m_GridMoveTime, start.x, end.x - start.x, 1.f));
+        if (m_GridMoveTime >= 1.f)
+        {
+            x = end.x;
+            m_GridMoving = false;
+            m_GridMoveTime = 0.f;
+        }
+        else
+            m_GridMoveTime += dt;
+
+        m_GridSprite.setPosition(x, start.y);
+    }
+    else
+    {
+        m_TileMgr.update(dt);
+
+        // Restart the game if requested.
+        if (m_Restart)
+        {
+            restart();
+            m_Restart = false;
+        }
+
+        // Check if we have to move tiles
+        if (m_MoveDirection.x != 0 || m_MoveDirection.y != 0)
+        {
+            moveTiles();
+            nullify(m_MoveDirection);
+        }
     }
 
-    // Check if we have to move tiles
-    if (m_MoveDirection != MoveNone)
-    {
-        moveTiles();
-        m_Grid.print();
-        m_MoveDirection = MoveNone;
-    }
-}
-
-void Game::onUpdateVariable(float dt)
-{
+    m_CursorSprite.setPosition(m_Game.getCursorPosition());
 }
 
 void Game::onFpsUpdated(int fps)
@@ -129,8 +142,8 @@ void Game::onFpsUpdated(int fps)
 void Game::onDraw(sf::RenderTarget& target)
 {
     m_Window.draw(m_GridSprite);
-    m_Window.draw(m_TestTile);
-    m_Window.draw(m_TestTile2);
+    m_TileMgr.draw(target);
+    m_Window.draw(m_CursorSprite);
 }
 
 void Game::onResize(unsigned width, unsigned height)
@@ -142,98 +155,109 @@ void Game::onResize(unsigned width, unsigned height)
     m_GridSprite.setPosition(static_cast<float>(width/2), static_cast<float>(height/2));
 }
 
-void Game::restart()
+void Game::restart() noexcept
 {
-    std::cout << "Game::restart()\n";
-
+    m_TileMgr.clear();
+    m_Grid.clear();
     addStartTiles();
-
-    m_Grid.print();
 }
 
-void Game::addRandomTile()
+void Game::addRandomTile() noexcept
 {
-    std::vector<Vec2u> freeCells;
+    std::vector<Vec2i> freeCells;
     m_Grid.getFreeCells(freeCells);
     if (freeCells.size() < 1) return;
     
-    auto cell(freeCells[randomInt(static_cast<int>(freeCells.size()))]);
+    auto freePos(freeCells[randomInt(static_cast<int>(freeCells.size()))]);
     auto value(randomInt(10) < 9 ? 2 : 4);
 
-    m_Grid.setCell(cell, value);
+    //m_Grid.setCellValue(cell, value);
+    //m_TileMgr.create(cell, value);
+
+    auto& cell(m_Grid.getCell(freePos));
+    cell.value = value;
+    m_TileMgr.create(freePos, value);
 }
 
-void Game::addStartTiles()
+void Game::addStartTiles() noexcept
 {
     for (auto n(0); n < numStartTiles; n++)
         addRandomTile();
 }
 
-int Game::moveTilesUp()
+void Game::moveTiles() noexcept
 {
-    // Keep track of how many moves were made, so we can decide if we should spawn a new tile
-    // (moves > 0) or not (moves = 0).
+    // Keep track of how many moves were made, so we can decide if we should spawn a new tile or not.
     auto moves(0);
 
-    // Step 1: foreach column, iterate from top to bottom and find empty cell.
-    for (auto col(0u); col < m_Grid.getNumCells(); col++)
+    // Prepare the grid cells (set merge flag to false)
+    m_Grid.prepare();
+
+    auto gridSize(static_cast<int>(m_Grid.getSize()));
+    auto dirX(m_MoveDirection.x);
+    auto dirY(m_MoveDirection.y);
+    int col, row;
+
+    // Loop through grid (based on direction of user input)
+    // Explanation:
+    // 
+    // if direction is positive (== 1) loop from 3 to 0,
+    // otherwise if direction is negative (== -1) loop from 0 to 3.
+    // use "col" and "row"
+    // "x" and "y" just for looping
+    for (auto x(0), col = (dirX == 1 ? gridSize - 1 : 0); x < gridSize;
+         x++, col = (dirX == 1 ? gridSize - x - 1 : x))
     {
-        for (auto row(0u); row < m_Grid.getNumCells() - 1; row++)
+        for (auto y(0), row = (dirY == 1 ? gridSize - 1 : 0); y < gridSize;
+             y++, row = (dirY == 1 ? gridSize - y - 1 : y))
         {
-            while(m_Grid.isCellEmpty(col, row) && m_Grid.hasAnyValueInColumn(col, row))
+            // Find empty slot:
+            // curPos points to the current cell which should be moved
+            // prevPos points to the empty cell
+            // nextPos points to the cell next to the empty cell (not empty)
+            //         can be out of grid bounds if there's not cell
+            Vec2i curPos{col, row};
+            Vec2i nextPos{col, row};
+            Vec2i prevPos;
+
+            do
             {
-                for (auto y(row); y < m_Grid.getNumCells() - 1; y++)
-                {
-                    m_Grid.setCell(col, y, m_Grid.getCell(col, y + 1));
-                    m_Grid.setCell(col, y + 1, 0);
-                }
+                prevPos = nextPos;
+                nextPos = {prevPos.x + dirX, prevPos.y + dirY};
+            }
+            while (m_Grid.isWithinBounds(nextPos) &&
+                   m_Grid.isCellEmpty(nextPos));
+    
+            // Get associated cells
+            auto cell(m_Grid.getCell(col, row));
+
+            // Check if this move can merge tiles (nextTile must be within bounds and not empty and
+            // cell values have to match)
+            if ((m_Grid.isWithinBounds(nextPos) && !m_Grid.isCellEmpty(nextPos)) &&
+                (m_Grid.getCellValue(nextPos) == m_Grid.getCellValue(curPos) && 
+                 !m_Grid.cellWasMerged(nextPos)))
+            {
+                m_Grid.mergeCells(curPos, nextPos);
+                m_TileMgr.mergeTiles(curPos, nextPos);
+            
+                moves++;
+            }
+            else
+            {
+                // prevPos == curPos -> no moves available (first cell)
+                if (prevPos == curPos) continue;
+                if (m_Grid.isCellEmpty(prevPos) && m_Grid.isCellEmpty(curPos)) continue;
+
+                m_Grid.setCellValue(prevPos, m_Grid.getCellValue(curPos));
+                m_Grid.setCellValue(curPos, 0);
+
+                m_TileMgr.moveTile(curPos, prevPos);
+
                 moves++;
             }
         }
     }
 
-    // All empty spaces are now on the bottom side and all tiles are next to each other.
- 
-    // Step 2: foreach column, combine like tiles
-    for (auto col(0u); col < m_Grid.getNumCells(); col++)
-    {
-        for (auto row(0u); row < m_Grid.getNumCells() - 1; row++)
-        {
-            // Check if value of current tile matches value of adjacent tile.
-            if (!m_Grid.isCellEmpty(col, row) && 
-                m_Grid.getCell(col, row) == m_Grid.getCell(col, row + 1))
-            {
-                // Move all tiles starting from the current cell to the top by one.
-                for (auto y(row); y < m_Grid.getNumCells() - 1; y++)
-                {
-                    m_Grid.setCell(col, y, m_Grid.getCell(col, y + 1));
-                    m_Grid.setCell(col, y + 1, 0);
-                }
-
-                // Increase value of current tile
-                m_Grid.increaseCell(col, row);
-
-                // TODO: add score here
-
-                moves++;
-            }
-        }
-    }
-
-    return moves;
-}
-
-void Game::moveTiles()
-{
-    auto iter(moveMap.find(m_MoveDirection));
-    if (iter == moveMap.end()) return;
-
-    auto times(iter->second);
-
-    m_Grid.rotate(times);
-    auto moves(moveTilesUp());
-    m_Grid.rotate(4 - times);
-
-    // Check if moves were made, if so add a new tile!
+    // Okay, moves were made, spawn a new tile.
     if (moves > 0) addRandomTile();
 }

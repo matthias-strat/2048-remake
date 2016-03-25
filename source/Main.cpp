@@ -3,14 +3,13 @@
 bool loadConfigFile(const std::string& filename, Json::Value& root)
 {
 
-
     return true;
 }
 
 int main()
 {
     Json::Value configRoot;
-    if (!loadConfigFile("", configRoot))
+    if (!loadConfigFile("config.json", configRoot))
     {
         std::cerr << "Failed to load configuration file." << std::endl;
         return 1;

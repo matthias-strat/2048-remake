@@ -1,4 +1,7 @@
 #pragma once
+
+#include <json/json.h>
+
 #include "Common.hpp"
 #include "Config.hpp"
 
@@ -21,10 +24,12 @@ public:
     sf::Font fntSansation;
 
     // Textures
+    sf::Texture txCursor;
     sf::Texture txRoundedRect;
     sf::Texture txRoundedRectSmall;
     const sf::Texture* txGrid{nullptr};
     const sf::Texture* txTile{nullptr};
+    const sf::Texture* txScoreboard{nullptr};
 
     // Colors (TODO: Load from scheme file)
     sf::Color colBackground{250, 248, 239};
@@ -78,9 +83,13 @@ public:
 private:
     void createGridTexture();
     void createTileTextures();
+    void createScoreTexture();
+
+    void loadSchemeFromJson(const Json::Value& root);
 
     UPtr<sf::RenderTexture> m_GridRender;
     UPtr<sf::RenderTexture> m_TileRender;
+    UPtr<sf::RenderTexture> m_ScoreRender;
 
     Config& m_Config;
 };

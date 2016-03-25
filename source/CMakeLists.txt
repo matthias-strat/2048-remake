@@ -5,6 +5,7 @@ set(RM2_SRC_LIST
 	Game.cpp
 	Grid.cpp
 	NinePatch.cpp
+	ScoreManager.cpp
 	Tile.cpp
 	TileManager.cpp
 	Config.cpp

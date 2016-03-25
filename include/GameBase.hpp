@@ -7,7 +7,7 @@ class GameBase
 public:
     std::function<void()> onLoadContent{nullptr};
     std::function<void(const sf::Event&)> onEvent{nullptr};
-    std::function<void(float ft)> onUpdateFixed{nullptr}, onUpdateVariable{nullptr};
+    std::function<void(float)> onUpdate{nullptr};
     std::function<void(int)> onFpsUpdated{nullptr};
     std::function<void(sf::RenderTarget&)> onDraw{nullptr};
 
@@ -21,7 +21,10 @@ public:
     sf::RenderWindow& getWindow() noexcept;
     const sf::RenderWindow& getWindow() const noexcept;
 
+    void setCursorVisible(bool visible) noexcept;
     void setClearColor(const sf::Color& color) noexcept;
+
+    Vec2f getCursorPosition() const noexcept;
 
     auto getWindowWidth() const noexcept;
     auto getWindowHeight() const noexcept;
@@ -29,18 +32,12 @@ public:
 private:
     void updateFpsCounter(sf::Time dt) noexcept;
 
-    // Safely invoke an std::function (check if null before invoking)
-    template <typename TFunc, typename... TArgs>
-    inline static void safeInvoke(TFunc& func, TArgs&&... args)
-    {
-        if (func != nullptr) func(std::forward<TArgs>(args)...);
-    }
-
 private:
     sf::RenderWindow m_Window;
     std::string m_WindowTitle;
     unsigned int m_WindowWidth, m_WindowHeight;
 
+    bool m_CursorVisible{true};
     sf::Color m_ClearColor{sf::Color::White};
 
     sf::Time m_FpsCounterTime{sf::Time::Zero};

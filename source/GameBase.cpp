@@ -15,17 +15,12 @@ void GameBase::run()
     m_Window.create({ m_WindowWidth, m_WindowHeight }, m_WindowTitle, sf::Style::Default);
     m_Window.setVerticalSyncEnabled(true);
     m_Window.setKeyRepeatEnabled(false);
+    m_Window.setMouseCursorVisible(m_CursorVisible);
 
-    // Integrate at 60Hz
-    static const auto timeStep(sf::seconds(1.f / 60.f));
-
-    auto accumulator(sf::Time::Zero);
     sf::Clock clock;
-
     while (m_Window.isOpen())
     {
         auto dt(clock.restart());
-        accumulator += dt;
 
         sf::Event event;
         while (m_Window.pollEvent(event))
@@ -39,15 +34,9 @@ void GameBase::run()
             safeInvoke(onEvent, event);
         }
 
-        while (accumulator >= timeStep)
-        {
-            accumulator -= timeStep;
-            safeInvoke(onUpdateFixed, timeStep.asSeconds());
-        }
-
         updateFpsCounter(dt);
-        safeInvoke(onUpdateVariable, dt.asSeconds());
-
+        safeInvoke(onUpdate, dt.asSeconds());
+    
         m_Window.clear(m_ClearColor);
         safeInvoke(onDraw, m_Window);
         m_Window.display();
@@ -64,9 +53,19 @@ const sf::RenderWindow& GameBase::getWindow() const noexcept
     return m_Window;
 }
 
+void GameBase::setCursorVisible(bool visible) noexcept
+{
+    m_CursorVisible = visible;
+}
+
 void GameBase::setClearColor(const sf::Color& color) noexcept
 {
     m_ClearColor = color;
+}
+
+Vec2f GameBase::getCursorPosition() const noexcept
+{
+    return m_Window.mapPixelToCoords(sf::Mouse::getPosition(m_Window));
 }
 
 auto GameBase::getWindowWidth() const noexcept

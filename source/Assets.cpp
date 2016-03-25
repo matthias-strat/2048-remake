@@ -38,6 +38,9 @@ void Assets::load()
     fntCode.loadFromFile("assets/codebd.otf");
     fntSansation.loadFromFile("assets/sansation.ttf");
 
+    // Load cursor from file
+    txCursor.loadFromFile("assets/cursor.png");
+
     // Load nine-patch assets from embedded memory.
     txRoundedRect.loadFromMemory(pngRoundedRect, pngRoundedRectSize);
     txRoundedRectSmall.loadFromMemory(pngRoundedRectSmall, pngRoundedRectSmallSize);
@@ -60,7 +63,7 @@ sf::IntRect Assets::getTileTextureRect(int v) const
 void Assets::createGridTexture()
 {
     auto size(calculateGridSize(defaultNumCells, defaultTileSize, defaultSpacing));
-    m_GridRender = std::make_unique<sf::RenderTexture>();
+    m_GridRender = mkUPtr<sf::RenderTexture>();
     m_GridRender->create(size, size);
 
     sf::RenderStates states;
@@ -99,7 +102,7 @@ void Assets::createTileTextures()
 {
     auto width(5 * defaultTileSize), height(4 * defaultTileSize);
 
-    m_TileRender = std::make_unique<sf::RenderTexture>();
+    m_TileRender = mkUPtr<sf::RenderTexture>();
     m_TileRender->create(width, height);
     m_TileRender->clear(sf::Color::Transparent);
 

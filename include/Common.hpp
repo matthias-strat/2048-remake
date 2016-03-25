@@ -38,21 +38,12 @@ const std::string configFile{"save/config.json"};
 // Default scheme file
 const std::string defaultScheme{"default.json"};
 
-enum MoveDirection
+// Safely invoke an std::function (check if null before invoking)
+template <typename TFunc, typename... TArgs>
+inline static void safeInvoke(TFunc& func, TArgs&&... args)
 {
-    MoveNone = 0,
-    MoveLeft = 1,
-    MoveRight,
-    MoveUp,
-    MoveDown,
-};
-static std::map<MoveDirection, int> moveMap =
-{
-    {MoveLeft, 3},
-    {MoveRight, 1},
-    {MoveUp, 0},
-    {MoveDown, 2}
-};
+    if (func != nullptr) func(std::forward<TArgs>(args)...);
+}
 
 template <typename T1, typename T2, typename T3>
 inline constexpr Common<T1, T2, T3> calculateGridSize(T1 numCells, T2 cellSize, T3 spacing)
@@ -65,6 +56,11 @@ constexpr float defaultGridSize{static_cast<float>(calculateGridSize(defaultNumC
 inline constexpr int get1DIndexFrom2D(int x, int y, int width) noexcept
 {
     return y + x * width;
+}
+
+inline constexpr int get1DIndexFrom2D(const Vec2i& vec, int width) noexcept
+{
+    return get1DIndexFrom2D(vec.x, vec.y, width);
 }
 
 inline sf::Color toColor(const std::string& str) noexcept

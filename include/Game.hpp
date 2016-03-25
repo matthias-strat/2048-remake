@@ -3,9 +3,8 @@
 #include "GameBase.hpp"
 #include "Assets.hpp"
 #include "Grid.hpp"
-#include "Tile.hpp"
-
-#include <queue>
+#include "TileManager.hpp"
+#include "ScoreManager.hpp"
 
 class Game
 {
@@ -19,20 +18,21 @@ public:
 private:
     void onLoadContent();
     void onEvent(const sf::Event& event);
-    void onUpdateFixed(float ft);
-    void onUpdateVariable(float ft);
     void onFpsUpdated(int fps);
+    void onUpdate(float dt);
     void onDraw(sf::RenderTarget& target);
 
     void onResize(unsigned int width, unsigned int height);
 
-    void restart();
+    void restart() noexcept;
 
-    void addRandomTile();
-    void addStartTiles();
+    void addRandomTile() noexcept;
+    void addStartTiles() noexcept;
 
-    int moveTilesUp();
-    void moveTiles();
+    //int moveTilesUp();
+    void moveTiles() noexcept;
+
+    bool isGameOver() const noexcept;
 
 private:
     GameBase m_Game;
@@ -40,11 +40,16 @@ private:
     sf::RenderWindow& m_Window;
     Assets m_Assets;
 
+    sf::Sprite m_CursorSprite;
+
     bool m_Restart{false};
 
-    MoveDirection m_MoveDirection{MoveNone};
+    Vec2i m_MoveDirection{0, 0};
 
     Grid m_Grid;
     sf::Sprite m_GridSprite;
-    Tile m_TestTile, m_TestTile2;
+    TileManager m_TileMgr;
+
+    bool m_GridMoving{false};
+    float m_GridMoveTime{0.f};
 };

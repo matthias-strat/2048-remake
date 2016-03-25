@@ -1,67 +1,57 @@
 #include "Grid.hpp"
 #include <cassert>
 
-Grid::Grid(unsigned int numCells) noexcept
+Grid::Grid(unsigned int size) noexcept
 {
-    resize(numCells);
-    clear();
+    resize(size);
 }
 
 void Grid::clear() noexcept
 {
-    for (auto col(0u); col < m_NumCells; col++)
+    for (auto col(0); col < m_Size; col++)
     {
-        for (auto row(0u); row < m_NumCells; row++)
-            m_Cells[col][row] = 0;
+        for (auto row(0); row < m_Size; row++)
+            m_Cells[col][row].value = 0;
     }
 }
 
-void Grid::resize(unsigned int numCells) noexcept
+void Grid::resize(unsigned int size) noexcept
 {
-    assert(numCells > 1);
-    m_NumCells = numCells;
+    assert(size > 1);
+    m_Size = size;
 
-    m_Cells.resize(numCells);
-    for (auto col(0u); col < numCells; col++)
-        m_Cells[col].resize(numCells);
+    m_Cells.resize(size);
+    for (auto col(0); col < size; col++)
+        m_Cells[col].resize(size);
 }
 
-void Grid::rotate(int times) noexcept
+void Grid::prepare() noexcept
 {
-    for (; times > 0; times--)
+    for (auto col(0); col < m_Size; col++)
     {
-        for (auto i(0); i < m_NumCells; i++)
-        {
-            for (auto j(i+1); j < m_NumCells; j++)
-                std::swap(m_Cells[i][j], m_Cells[j][i]);
-        }
-
-        for (auto i(0); i < m_NumCells; i++)
-        {
-            for (auto j(0); j < m_NumCells/2; j++)
-                std::swap(m_Cells[i][j], m_Cells[i][m_NumCells-1-j]);
-        }
+        for (auto row(0); row < m_Size; row++)
+            m_Cells[row][col].merged = false;
     }
 }
 
-bool Grid::isWithinBounds(const Vec2u& pos) const noexcept
+bool Grid::isWithinBounds(const Vec2i& pos) const noexcept
 {
-    return pos.x < m_NumCells && pos.y < m_NumCells;
+    return (pos.x >= 0 && pos.x < m_Size) && (pos.y >= 0 && pos.y < m_Size);
 }
 
-bool Grid::isWithinBounds(unsigned int col, unsigned int row) const noexcept
+bool Grid::isWithinBounds(int col, int row) const noexcept
 {
     return isWithinBounds({col, row});
 }
 
-void Grid::getFreeCells(std::vector<Vec2u>& freeCells) const noexcept
+void Grid::getFreeCells(std::vector<Vec2i>& freeCells) const noexcept
 {
-    freeCells.reserve(m_NumCells*m_NumCells);
-    for (auto col(0u); col < m_NumCells; col++)
+    freeCells.reserve(m_Size*m_Size);
+    for (auto col(0u); col < m_Size; col++)
     {
-        for (auto row(0u); row < m_NumCells; row++)
+        for (auto row(0u); row < m_Size; row++)
         {
-            if (m_Cells[col][row] == 0)
+            if (m_Cells[col][row].value == 0)
                 freeCells.emplace_back(col, row);
         }
     }
@@ -69,70 +59,87 @@ void Grid::getFreeCells(std::vector<Vec2u>& freeCells) const noexcept
 
 bool Grid::hasFreeCells() const noexcept
 {
-    std::vector<Vec2u> freeCells;
+    std::vector<Vec2i> freeCells;
     getFreeCells(freeCells);
     return freeCells.size() > 0;
 }
 
-int Grid::getCell(const Vec2u& pos) const noexcept
+const Grid::Cell& Grid::getCell(const Vec2i& pos) const noexcept
 {
     assert(isWithinBounds(pos));
     return m_Cells[pos.x][pos.y];
 }
 
-int Grid::getCell(unsigned int col, unsigned int row) const noexcept
+Grid::Cell& Grid::getCell(const Vec2i& pos) noexcept
+{
+    assert(isWithinBounds(pos));
+    return m_Cells[pos.x][pos.y];
+}
+
+const Grid::Cell& Grid::getCell(int col, int row) const noexcept
 {
     return getCell({col, row});
 }
 
-bool Grid::isCellEmpty(unsigned int col, unsigned int row) const noexcept
+Grid::Cell& Grid::getCell(int col, int row) noexcept
 {
-    return getCell(col, row) == 0;
+    return getCell({col, row});
 }
 
-bool Grid::hasAnyValueInColumn(int col, int startRow) const noexcept
-{
-    assert(isWithinBounds(col, startRow));
-
-    for (auto y(startRow); y < m_NumCells; y++)
-    {
-        if (m_Cells[col][y] != 0)
-            return true;
-    }
-
-    return false;
-}
-
-void Grid::setCell(const Vec2u& pos, int value) noexcept
+int Grid::getCellValue(const Vec2i& pos) const noexcept
 {
     assert(isWithinBounds(pos));
-    m_Cells[pos.x][pos.y] = value;
+    return m_Cells[pos.x][pos.y].value;
 }
 
-void Grid::setCell(unsigned int col, unsigned int row, int value) noexcept
+int Grid::getCellValue(int col, int row) const noexcept
 {
-    setCell({col, row}, value);
+    return getCellValue({col, row});
 }
 
-void Grid::increaseCell(unsigned int col, unsigned int row) noexcept
+void Grid::mergeCells(const Vec2i& from, const Vec2i& to) noexcept
 {
-    assert(isWithinBounds(col, row));
-    m_Cells[col][row] *= 2;
+    assert(isWithinBounds(from));
+    assert(isWithinBounds(to));
+
+    m_Cells[to.x][to.y].value *= 2;
+    m_Cells[from.x][from.y].value = 0;
+    m_Cells[to.x][to.y].merged = true;
 }
 
-unsigned int Grid::getNumCells() const noexcept
+bool Grid::isCellEmpty(const Vec2i& pos) const noexcept
 {
-    return m_NumCells;
+    return getCellValue(pos) == 0;
 }
 
-void Grid::print()
+bool Grid::isCellEmpty(int col, int row) const noexcept
 {
-    for (auto row(0); row < m_NumCells; row++) {
-        for (auto col(0); col < m_NumCells; col++) {
-            if (m_Cells[col][row] == 0) std::cout << "- ";
-            else std::cout << m_Cells[col][row] << " ";
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n";
+    return isCellEmpty({col, row});
+}
+
+bool Grid::cellWasMerged(const Vec2i& pos) const noexcept
+{
+    return getCell(pos).merged;
+}
+
+void Grid::setCellValue(const Vec2i& pos, int value) noexcept
+{
+    assert(isWithinBounds(pos));
+    m_Cells[pos.x][pos.y].value = value;
+}
+
+void Grid::setCellValue(int col, int row, int value) noexcept
+{
+    setCellValue({col, row}, value);
+}
+
+void Grid::increaseCellValue(const Vec2i& pos) noexcept
+{
+    assert(isWithinBounds(pos));
+    m_Cells[pos.x][pos.y].value *= 2;
+}
+
+unsigned int Grid::getSize() const noexcept
+{
+    return m_Size;
 }

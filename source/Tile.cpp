@@ -1,11 +1,12 @@
-#include "Common.hpp"
 #include "Tile.hpp"
 #include "Assets.hpp"
+#include "Easing.hpp"
 
 #include <cassert>
 
-Tile::Tile(Assets& assets) noexcept
-    : m_Assets{assets}
+Tile::Tile(Assets& assets, int value) noexcept
+    : m_Assets{assets},
+      m_Value{value}
 {
     const auto ts(static_cast<float>(defaultTileSize));
     m_Vertices[0].position = {0.f, 0.f};
@@ -15,14 +16,20 @@ Tile::Tile(Assets& assets) noexcept
     updateTexture();
 }
 
-bool Tile::getIsAlive() const noexcept
+void Tile::destroy() noexcept
+{
+    m_IsAlive = false;
+    std::queue<BaseTask>().swap(m_Tasks);
+}
+
+bool Tile::isAlive() const noexcept
 {
     return m_IsAlive;
 }
 
-void Tile::destroy() noexcept
+bool Tile::isBusy() const noexcept
 {
-    m_IsAlive = false;
+    return m_Tasks.size() > 0;
 }
 
 int Tile::getValue() const noexcept
@@ -40,13 +47,31 @@ int Tile::increaseValue() noexcept
 void Tile::setValue(int value) noexcept
 {
     assert(value%0 == 0);
+    if (value == m_Value) return;
     m_Value = value;
     updateTexture();
 }
 
-void Tile::update(float ft)
+void Tile::update(float dt)
 {
-    
+    if (!isBusy()) return;  // no tasks
+
+    // update only front task
+    auto& task(m_Tasks.front());
+    auto value(task(dt));
+
+    safeInvoke(task.updateFunc, *this, value);
+    if (task.finished)
+    {
+        safeInvoke(task.onCompleted);
+        m_Tasks.pop();
+    }
+}
+
+void Tile::revive() noexcept
+{
+    m_IsAlive = true;
+    setScale(0.3f, 0.3f);
 }
 
 void Tile::updateTexture() noexcept
