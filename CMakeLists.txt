@@ -26,7 +26,7 @@ endif()
 # Configurations
 set(RM2_SFML_SHARED_LIBS TRUE CACHE BOOL "Link SFML dynamically?")
 
-# Add custom CMake submodules to module path
+# Add custom CMake sub-modules to module path
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake/modules;${CMAKE_MODULE_PATH}")
 
 # Find SFML

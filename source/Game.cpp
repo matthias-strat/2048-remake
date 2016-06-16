@@ -54,8 +54,9 @@ void Game::onLoadContent()
 
     m_CursorSprite.setTexture(m_Assets.txCursor);
 
+    Vec2f halfScreen{windowWidth/2.f, windowHeight/2.f};
     m_GridSprite.setTexture(*m_Assets.txGrid);
-    m_GridSprite.setPosition(windowWidth/2.f, windowHeight/2.f);
+    m_GridSprite.setPosition(halfScreen*3.f);
     m_GridSprite.setOrigin(defaultGridSize/2.f, defaultGridSize/2.f);
 
     restart();
@@ -96,20 +97,21 @@ void Game::onEvent(const sf::Event& event)
 
 void Game::onUpdate(float dt)
 {
-    if (m_GridMoving)
+    if (m_IsFading)
     {
-        Vec2f start{defaultWindowWidth/2.f, defaultWindowHeight/2.f};
-        Vec2f end{start*3.f};
+        Vec2f halfScreen{defaultWindowWidth/2.f, defaultWindowHeight/2.f};
+        Vec2f start{halfScreen.x * 3.f, halfScreen.y};
+        Vec2f end{halfScreen};
 
-        auto x(easing::Back<float>::in(m_GridMoveTime, start.x, end.x - start.x, 1.f));
-        if (m_GridMoveTime >= 1.f)
+        auto x(easing::Bounce<float>::out(m_FadeTime, start.x, end.x - start.x, 1.f));
+        if (m_FadeTime >= 1.f)
         {
             x = end.x;
-            m_GridMoving = false;
-            m_GridMoveTime = 0.f;
+            m_IsFading = false;
+            m_FadeTime = 0.f;
         }
         else
-            m_GridMoveTime += dt;
+            m_FadeTime += dt;
 
         m_GridSprite.setPosition(x, start.y);
     }
@@ -142,7 +144,8 @@ void Game::onFpsUpdated(int fps)
 void Game::onDraw(sf::RenderTarget& target)
 {
     m_Window.draw(m_GridSprite);
-    m_TileMgr.draw(target);
+    if (!m_IsFading)
+        m_TileMgr.draw(target);
     m_Window.draw(m_CursorSprite);
 }
 
@@ -153,6 +156,11 @@ void Game::onResize(unsigned width, unsigned height)
 
     // Center grid again
     m_GridSprite.setPosition(static_cast<float>(width/2), static_cast<float>(height/2));
+}
+
+void Game::onPlaygroundReady()
+{
+
 }
 
 void Game::restart() noexcept
@@ -174,8 +182,7 @@ void Game::addRandomTile() noexcept
     //m_Grid.setCellValue(cell, value);
     //m_TileMgr.create(cell, value);
 
-    auto& cell(m_Grid.getCell(freePos));
-    cell.value = value;
+    m_Grid.setCellValue(freePos, value);
     m_TileMgr.create(freePos, value);
 }
 

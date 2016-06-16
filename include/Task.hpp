@@ -5,9 +5,9 @@
 class Tile;
 struct BaseTask
 {
-    using EaseFunc = std::function<float(float, float, float, float)>;
-    using CompleteFunc = std::function<void()>;
-    using UpdateFunc = std::function<void(Tile& tile, float)>;
+    using EaseFunc = Func<float(float, float, float, float)>;
+    using CompleteFunc = Func<void()>;
+    using UpdateFunc = Func<void(Tile& tile, float)>;
 
     float time{0.f};
     float start, end, duration;

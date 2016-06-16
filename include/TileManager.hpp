@@ -18,6 +18,8 @@ public:
     void moveTile(const Vec2i& from, const Vec2i& to);
     void mergeTiles(const Vec2i& from, const Vec2i& to);
 
+    bool isBusy() const noexcept;
+
 private:
     Vec2f gridPosToWorldPos(const Vec2i& gridPos) noexcept;
 
@@ -26,4 +28,5 @@ private:
     unsigned int m_GridSize;
     unsigned int m_WindowWidth{defaultWindowWidth}, m_WindowHeight{defaultWindowHeight};
     std::vector<UPtr<Tile>> m_Tiles;
+    bool m_IsBusy{false};
 };

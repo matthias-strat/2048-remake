@@ -5,12 +5,37 @@
 #include "Common.hpp"
 #include "Task.hpp"
 
+class TileManagerNew;
 class TileManager;
 class Assets;
+
+class NewTile : public sf::Drawable, public sf::Transformable
+{
+    friend class TileManager;
+
+public:
+    NewTile(TileManager& tileMgr, Assets& assets, int value = 2) noexcept;
+
+    void destroy() noexcept;
+    bool isAlive() const noexcept;
+
+private:
+    void revive();
+
+private:
+    TileManager& m_TileMgr;
+    Assets& m_Assets;
+
+    int m_Value;
+    sf::Vertex m_Vertices[4];
+
+    bool m_IsAlive{false};
+};
 
 class Tile : public sf::Drawable, public sf::Transformable
 {
     friend class TileManager;
+    friend class TileManagerNew;
 
 public:
     explicit Tile(Assets& assets, int value = 2) noexcept;
@@ -32,7 +57,7 @@ public:
     }
 
     template <typename TTask, typename... TArgs>
-    void addTask(TArgs&&... args, std::function<void()> onCompleted)
+    void addTask(TArgs&&... args, Func<void()> onCompleted)
     {
         TTask task{FWD(args)..., onCompleted};
         m_Tasks.push(task);

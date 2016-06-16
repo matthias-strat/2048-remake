@@ -5,14 +5,17 @@
 class GameBase
 {
 public:
-    std::function<void()> onLoadContent{nullptr};
-    std::function<void(const sf::Event&)> onEvent{nullptr};
-    std::function<void(float)> onUpdate{nullptr};
-    std::function<void(int)> onFpsUpdated{nullptr};
-    std::function<void(sf::RenderTarget&)> onDraw{nullptr};
+    Func<void()> onLoadContent{nullptr};
+    Func<void(const sf::Event&)> onEvent{nullptr};
+    Func<void(float)> onUpdate{nullptr};
+    Func<void(int)> onFpsUpdated{nullptr};
+    Func<void(sf::RenderTarget&)> onDraw{nullptr};
 
 public:
-    explicit GameBase(const std::string& windowTitle, unsigned int windowWidth = 1024, unsigned int windowHeight = 768) noexcept;
+    explicit GameBase(const std::string& windowTitle, unsigned int windowWidth = 1024, 
+        unsigned int windowHeight = 768) noexcept;
+
+    // Delete copy constructor and copy assignment operator.
     GameBase(const GameBase&) = delete;
     GameBase& operator=(const GameBase&) = delete;
 

@@ -24,6 +24,8 @@ private:
 
     void onResize(unsigned int width, unsigned int height);
 
+    void onPlaygroundReady();
+
     void restart() noexcept;
 
     void addRandomTile() noexcept;
@@ -35,6 +37,7 @@ private:
     bool isGameOver() const noexcept;
 
 private:
+
     GameBase m_Game;
     Config m_Config;
     sf::RenderWindow& m_Window;
@@ -52,4 +55,7 @@ private:
 
     bool m_GridMoving{false};
     float m_GridMoveTime{0.f};
+
+    bool m_IsFading{true};
+    float m_FadeTime{0.f};
 };

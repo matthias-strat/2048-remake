@@ -1,16 +1,22 @@
 #include "TileManager.hpp"
 #include <cassert>
 
+
 TileManager::TileManager(Assets& assets, unsigned int gridSize)
     : m_Assets{assets},
       m_GridSize{gridSize}
 {
     m_Tiles.resize(gridSize*gridSize);
-    for (auto n(0); n < gridSize*gridSize; n++)
+    for (auto x(0); x < gridSize; x++)
     {
-        auto ptr(mkUPtr<Tile>(assets));
-        ptr->setOrigin(defaultTileSize/2.f, defaultTileSize/2.f);
-        m_Tiles[n] = std::move(ptr);
+        for (auto y(0); y < gridSize; y++) 
+        {
+            auto ptr(mkUPtr<Tile>(assets));
+            ptr->setPosition(gridPosToWorldPos({x, y}));
+            ptr->setOrigin(defaultTileSize/2.f, defaultTileSize/2.f);
+
+            m_Tiles[get1DIndexFrom2D(x, y, m_GridSize)] = std::move(ptr);
+        }
     }
 }
 
@@ -33,11 +39,25 @@ Tile& TileManager::create(const Vec2i& gridPos, int value)
 
 void TileManager::moveTile(const Vec2i& fromPos, const Vec2i& toPos)
 {
+    auto fromIdx(get1DIndexFrom2D(fromPos, m_GridSize));
+    auto toIdx(get1DIndexFrom2D(toPos, m_GridSize));
+
+    m_Tiles[toIdx]->setValue(m_Tiles[fromIdx]->getValue());
+    m_Tiles[fromIdx]->destroy();
+    m_Tiles[toIdx]->revive();
+    m_Tiles[toIdx]->setScale(1.0, 1.0);
 }
 
 void TileManager::mergeTiles(const Vec2i& fromPos, const Vec2i& toPos)
 {
-    
+    auto fromIdx(get1DIndexFrom2D(fromPos, m_GridSize));
+    auto toIdx(get1DIndexFrom2D(toPos, m_GridSize));
+
+    m_Tiles[toIdx]->setValue(m_Tiles[fromIdx]->getValue());
+    m_Tiles[toIdx]->increaseValue();
+    m_Tiles[fromIdx]->destroy();
+    m_Tiles[toIdx]->revive();
+    m_Tiles[toIdx]->setScale(1.0, 1.0);
 }
 
 void TileManager::clear()

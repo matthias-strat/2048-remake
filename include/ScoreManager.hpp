@@ -18,6 +18,11 @@ public:
 
     void reset() noexcept;
 
+    void update(float dt);
+    void draw(sf::RenderTarget& target);
+
+private:
+
 private:
     sf::Sprite m_Sprite;
     int m_Score{0}, m_BestScore{0};

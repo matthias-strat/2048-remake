@@ -38,6 +38,24 @@ const std::string configFile{"save/config.json"};
 // Default scheme file
 const std::string defaultScheme{"default.json"};
 
+// Specifies the difficulty of the game
+enum class Difficulty
+{
+    // Enables unlimited un-dos.
+    Practice,
+    // Enabled 4 un-dos.
+    Easy,
+    // Classic gameplay, no un-dos
+    Normal
+};
+
+// Specifies the current state of the game
+enum class GameState
+{
+    InMenu,
+    InGame
+};
+
 // Safely invoke an std::function (check if null before invoking)
 template <typename TFunc, typename... TArgs>
 inline static void safeInvoke(TFunc& func, TArgs&&... args)

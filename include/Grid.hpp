@@ -11,9 +11,6 @@ public:
         // the value of the cell (0 = empty)
         int value{0};
 
-        // the associated tile
-        Tile* tile{nullptr};
-
         // A bool indicating whether this cell was already merged in the current move.
         // This prevents multiple merges in a single move (2 2 4 4 > 4 4 4 - > 8 4 - - )
         bool merged{false};
