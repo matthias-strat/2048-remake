@@ -71,16 +71,6 @@ inline constexpr Common<T1, T2, T3> calculateGridSize(T1 numCells, T2 cellSize, 
 
 constexpr float defaultGridSize{static_cast<float>(calculateGridSize(defaultNumCells, defaultTileSize, defaultSpacing))};
 
-inline constexpr int get1DIndexFrom2D(int x, int y, int width) noexcept
-{
-    return y + x * width;
-}
-
-inline constexpr int get1DIndexFrom2D(const Vec2i& vec, int width) noexcept
-{
-    return get1DIndexFrom2D(vec.x, vec.y, width);
-}
-
 inline sf::Color toColor(const std::string& str) noexcept
 {
     using namespace std;

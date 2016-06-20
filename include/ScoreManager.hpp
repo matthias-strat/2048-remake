@@ -24,6 +24,7 @@ public:
 private:
 
 private:
-    sf::Sprite m_Sprite;
+    Assets& m_Assets;
     int m_Score{0}, m_BestScore{0};
+    sf::Text m_ScoreText, m_BestScoreText;
 };

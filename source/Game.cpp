@@ -16,8 +16,7 @@ namespace
 Game::Game()
     : m_Game{"2048", windowWidth, windowHeight},
       m_Window{m_Game.getWindow()},
-      m_Assets{m_Config},
-      m_TileMgr{m_Assets, m_Grid.getSize()}
+      m_Assets{m_Config}
 {
     m_Game.onLoadContent = [this]()
         {
@@ -59,6 +58,9 @@ void Game::onLoadContent()
     m_GridSprite.setPosition(halfScreen*3.f);
     m_GridSprite.setOrigin(defaultGridSize/2.f, defaultGridSize/2.f);
 
+    m_TileMgr = mkUPtr<TileManager>(m_Assets, m_Grid.getSize());
+    m_ScoreMgr = mkUPtr<ScoreManager>(m_Assets);
+
     restart();
 }
 
@@ -68,6 +70,8 @@ void Game::onEvent(const sf::Event& event)
 
     if (event.type == sf::Event::KeyPressed)
     {
+        if (m_IsFading) return;
+
         using k = sf::Keyboard::Key;
         
         // Vertical movement
@@ -89,7 +93,7 @@ void Game::onEvent(const sf::Event& event)
         {
             m_GridMoving = true;
             m_Grid.clear();
-            m_TileMgr.clear();
+            m_TileMgr->clear();
         }
     }
 
@@ -115,23 +119,25 @@ void Game::onUpdate(float dt)
 
         m_GridSprite.setPosition(x, start.y);
     }
-    else
+
+    if (!m_IsFading)
     {
-        m_TileMgr.update(dt);
+        if (m_TileMgr != nullptr) m_TileMgr->update(dt);
+        if (m_ScoreMgr != nullptr) m_ScoreMgr->update(dt);       
+    }
 
-        // Restart the game if requested.
-        if (m_Restart)
-        {
-            restart();
-            m_Restart = false;
-        }
+    // Restart the game if requested.
+    if (m_Restart)
+    {
+        restart();
+        m_Restart = false;
+    }
 
-        // Check if we have to move tiles
-        if (m_MoveDirection.x != 0 || m_MoveDirection.y != 0)
-        {
-            moveTiles();
-            nullify(m_MoveDirection);
-        }
+    // Check if we have to move tiles
+    if (m_MoveDirection.x != 0 || m_MoveDirection.y != 0)
+    {
+        moveTiles();
+        nullify(m_MoveDirection);
     }
 
     m_CursorSprite.setPosition(m_Game.getCursorPosition());
@@ -145,7 +151,11 @@ void Game::onDraw(sf::RenderTarget& target)
 {
     m_Window.draw(m_GridSprite);
     if (!m_IsFading)
-        m_TileMgr.draw(target);
+    {
+        if (m_TileMgr != nullptr) m_TileMgr->draw(target);
+        if (m_ScoreMgr != nullptr) m_ScoreMgr->draw(target);
+    }
+
     m_Window.draw(m_CursorSprite);
 }
 
@@ -165,7 +175,8 @@ void Game::onPlaygroundReady()
 
 void Game::restart() noexcept
 {
-    m_TileMgr.clear();
+    m_TileMgr->clear();
+    m_ScoreMgr->reset();
     m_Grid.clear();
     addStartTiles();
 }
@@ -179,11 +190,8 @@ void Game::addRandomTile() noexcept
     auto freePos(freeCells[randomInt(static_cast<int>(freeCells.size()))]);
     auto value(randomInt(10) < 9 ? 2 : 4);
 
-    //m_Grid.setCellValue(cell, value);
-    //m_TileMgr.create(cell, value);
-
     m_Grid.setCellValue(freePos, value);
-    m_TileMgr.create(freePos, value);
+    m_TileMgr->create(freePos, value);
 }
 
 void Game::addStartTiles() noexcept
@@ -245,8 +253,10 @@ void Game::moveTiles() noexcept
                  !m_Grid.cellWasMerged(nextPos)))
             {
                 m_Grid.mergeCells(curPos, nextPos);
-                m_TileMgr.mergeTiles(curPos, nextPos);
-            
+                
+                m_TileMgr->moveTile(curPos, nextPos, true);
+                m_ScoreMgr->addScore(m_Grid.getCellValue(nextPos));
+
                 moves++;
             }
             else
@@ -258,7 +268,7 @@ void Game::moveTiles() noexcept
                 m_Grid.setCellValue(prevPos, m_Grid.getCellValue(curPos));
                 m_Grid.setCellValue(curPos, 0);
 
-                m_TileMgr.moveTile(curPos, prevPos);
+                m_TileMgr->moveTile(curPos, prevPos, false);
 
                 moves++;
             }
@@ -266,5 +276,45 @@ void Game::moveTiles() noexcept
     }
 
     // Okay, moves were made, spawn a new tile.
-    if (moves > 0) addRandomTile();
+    if (moves > 0)
+    {
+        addRandomTile();
+        if (isGameOver()) std::cout << "ouch, game over!" << std::endl;
+    }
+}
+
+bool Game::isGameOver() const noexcept
+{
+    // If there are empty cells in the grid, game can't be over.
+    if (m_Grid.hasFreeCells())
+        return false;
+
+    // If there aren't free cells, check if there are tiles which can still merge.
+    // We do this by looping through each cell in the grid and check whether it's neighbour
+    // (in all 4 directions) has the same value. If this is the case we can safely say that
+    // the game isn't over and we can stop iterating through the grid.
+    auto gridSize(static_cast<int>(m_Grid.getSize()));
+    for (auto col(0); col < gridSize; col++)
+    {
+        for (auto row(0); row < gridSize; row++)
+        {
+            // Static array which contains all directions to check (so we can loop).
+            static const Vec2i dirs[] = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
+            
+            assert(m_Grid.isWithinBounds(col, row));
+
+            // For each direction, check if neighbour has same value.
+            for (auto i(0); i < 4; i++)
+            {
+                Vec2i nextSlot{col + dirs[i].x, row + dirs[i].y};
+                if (m_Grid.isWithinBounds(nextSlot) && 
+                    m_Grid.getCellValue(col, row) == m_Grid.getCellValue(nextSlot))
+                    return false;
+            }
+        }
+    }
+
+    // If we reach here, we haven't found any neighboring cells with the same value.
+    // Bad luck, game is over!
+    return true;
 }

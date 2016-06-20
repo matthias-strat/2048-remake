@@ -80,6 +80,8 @@ public:
         {249, 246, 242}     // 524288
     };
 
+    sf::Color colTxtScore{187, 173, 160};
+
 private:
     void createGridTexture();
     void createTileTextures();

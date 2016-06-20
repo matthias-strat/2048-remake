@@ -1,5 +1,3 @@
 #!/bin/bash
-cd build/
-make
-cd ..
+./build.sh
 ./build/bin/2048

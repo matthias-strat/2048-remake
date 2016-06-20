@@ -5,45 +5,16 @@
 #include "Common.hpp"
 #include "Task.hpp"
 
-class TileManagerNew;
 class TileManager;
 class Assets;
 
-class NewTile : public sf::Drawable, public sf::Transformable
-{
-    friend class TileManager;
-
-public:
-    NewTile(TileManager& tileMgr, Assets& assets, int value = 2) noexcept;
-
-    void destroy() noexcept;
-    bool isAlive() const noexcept;
-
-private:
-    void revive();
-
-private:
-    TileManager& m_TileMgr;
-    Assets& m_Assets;
-
-    int m_Value;
-    sf::Vertex m_Vertices[4];
-
-    bool m_IsAlive{false};
-};
-
 class Tile : public sf::Drawable, public sf::Transformable
 {
+    // Share private members with TileManager class.
     friend class TileManager;
-    friend class TileManagerNew;
 
 public:
-    explicit Tile(Assets& assets, int value = 2) noexcept;
-
-    // destroys the tile (also kills all tasks)
-    void destroy() noexcept;
-    bool isAlive() const noexcept;
-    bool isBusy() const noexcept;
+    Tile(Assets& assets, int value = 2) noexcept;
 
     int getValue() const noexcept;
     int increaseValue() noexcept;
@@ -65,10 +36,15 @@ public:
 
     void update(float dt);
 
+    void setDrawPriority(int priority) noexcept;
+    int getDrawPriority() const noexcept;
+
 private:
-    void revive() noexcept;
-    void updateTexture() noexcept;
+    void updateTexture();
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
+    bool isMarkedForRemoval() const noexcept;
+    void markForRemoval() noexcept;
 
 private:
     Assets& m_Assets;
@@ -76,7 +52,9 @@ private:
     int m_Value;
     sf::Vertex m_Vertices[4];
 
-    bool m_IsAlive{false};
+    bool m_IsMarkedForRemoval{false};
 
     std::queue<BaseTask> m_Tasks;
+
+    int m_DrawPriority{0};
 };

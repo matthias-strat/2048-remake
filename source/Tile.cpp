@@ -10,26 +10,10 @@ Tile::Tile(Assets& assets, int value) noexcept
 {
     const auto ts(static_cast<float>(defaultTileSize));
     m_Vertices[0].position = {0.f, 0.f};
-    m_Vertices[1].position = {ts, 0.f};
-    m_Vertices[2].position = {ts, ts};
+    m_Vertices[1].position = {ts , 0.f};
+    m_Vertices[2].position = {ts , ts};
     m_Vertices[3].position = {0.f, ts};
     updateTexture();
-}
-
-void Tile::destroy() noexcept
-{
-    m_IsAlive = false;
-    std::queue<BaseTask>().swap(m_Tasks);
-}
-
-bool Tile::isAlive() const noexcept
-{
-    return m_IsAlive;
-}
-
-bool Tile::isBusy() const noexcept
-{
-    return m_Tasks.size() > 0;
 }
 
 int Tile::getValue() const noexcept
@@ -46,15 +30,15 @@ int Tile::increaseValue() noexcept
 
 void Tile::setValue(int value) noexcept
 {
-    assert(value%0 == 0);
-    if (value == m_Value) return;
+    assert(value%2==0);
+    if (m_Value == value) return;
     m_Value = value;
     updateTexture();
 }
 
 void Tile::update(float dt)
 {
-    if (!isBusy()) return;  // no tasks
+    if (m_Tasks.size() == 0) return;
 
     // update only front task
     auto& task(m_Tasks.front());
@@ -63,18 +47,22 @@ void Tile::update(float dt)
     safeInvoke(task.updateFunc, *this, value);
     if (task.finished)
     {
-        safeInvoke(task.onCompleted);
+        safeInvoke(task.onCompleted, *this);
         m_Tasks.pop();
     }
 }
 
-void Tile::revive() noexcept
+void Tile::setDrawPriority(int priority) noexcept
 {
-    m_IsAlive = true;
-    setScale(0.3f, 0.3f);
+    m_DrawPriority = priority;
 }
 
-void Tile::updateTexture() noexcept
+int Tile::getDrawPriority() const noexcept
+{
+    return m_DrawPriority;
+}
+
+void Tile::updateTexture()
 {
     auto texRect(m_Assets.getTileTextureRect(m_Value));
     auto left(static_cast<float>(texRect.left));
@@ -93,4 +81,13 @@ void Tile::draw(sf::RenderTarget& target, sf::RenderStates states) const
     states.transform *= getTransform();
     states.texture = m_Assets.txTile;
     target.draw(m_Vertices, 4, sf::Quads, states);
+}
+
+bool Tile::isMarkedForRemoval() const noexcept
+{    return m_IsMarkedForRemoval;
+}
+
+void Tile::markForRemoval() noexcept
+{
+    m_IsMarkedForRemoval = true;
 }

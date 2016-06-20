@@ -6,8 +6,8 @@ class Tile;
 struct BaseTask
 {
     using EaseFunc = Func<float(float, float, float, float)>;
-    using CompleteFunc = Func<void()>;
-    using UpdateFunc = Func<void(Tile& tile, float)>;
+    using CompleteFunc = Func<void(Tile&)>;
+    using UpdateFunc = Func<void(Tile&, float)>;
 
     float time{0.f};
     float start, end, duration;
@@ -51,5 +51,13 @@ struct PopTask : public BaseTask
     PopTask(float start, float end, float duration, UpdateFunc updateFunc,
             CompleteFunc onCompleted = nullptr)
         : BaseTask{start, end, duration, easing::Quart<float>::out, updateFunc, onCompleted}
+    { }
+};
+
+struct BlinkTask : public BaseTask
+{
+    BlinkTask(float start, float end, float duration, UpdateFunc updateFunc,
+            CompleteFunc onCompleted = nullptr)
+        : BaseTask{start, end, duration, easing::Linear<float>::out, updateFunc, onCompleted}
     { }
 };

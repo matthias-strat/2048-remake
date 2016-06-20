@@ -51,11 +51,14 @@ private:
 
     Grid m_Grid;
     sf::Sprite m_GridSprite;
-    TileManager m_TileMgr;
+
+    UPtr<TileManager> m_TileMgr;
+    UPtr<ScoreManager> m_ScoreMgr;
 
     bool m_GridMoving{false};
     float m_GridMoveTime{0.f};
 
     bool m_IsFading{true};
     float m_FadeTime{0.f};
+
 };
