@@ -1,2 +1,4 @@
 # Ignore build directory
 build/*
+# Ignore Visual Studio solution directory (temporary)
+VS15/*
