@@ -12,11 +12,11 @@
 
 // Define some common constants used throughout the game
 // TODO: Calculate grid size, tile size, spacing and positions based on screen resolution
-constexpr unsigned int windowWidth{800};
-constexpr unsigned int windowHeight{600};
+constexpr unsigned int windowWidth{1024};
+constexpr unsigned int windowHeight{768};
 
-constexpr unsigned int defaultWindowWidth{800};
-constexpr unsigned int defaultWindowHeight{600};
+constexpr unsigned int defaultWindowWidth{1024};
+constexpr unsigned int defaultWindowHeight{768};
 constexpr unsigned int defaultNumCells{4}; // Default number of cells in the grid (x and y always the same)
 constexpr unsigned int defaultSpacing{14}; // Default spacing between the cells (in pixels)
 constexpr unsigned int defaultTileSize{110}; // Default size of the cells and tiles (in pixels)

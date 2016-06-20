@@ -18,7 +18,7 @@ public:
 private:
     void applyPendingChanges();
     void removeDeadTiles();
-    Vec2f gridPosToWorldPos(const Vec2i& gridPos) noexcept;
+    Vec2f gridPosToWorldPos(const Vec2i& gridPos) const noexcept;
 
 private:
     struct TileCell

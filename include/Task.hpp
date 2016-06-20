@@ -19,8 +19,8 @@ struct BaseTask
     BaseTask(float start, float end, float duration, EaseFunc easeFunc,
              UpdateFunc updateFunc, CompleteFunc onCompleted)
         : start{start}, end{end}, duration{duration},
-          updateFunc{updateFunc},
           easeFunc{easeFunc},
+          updateFunc{updateFunc},
           onCompleted{onCompleted}
     { }
 

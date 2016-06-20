@@ -4,7 +4,7 @@
 namespace
 {
     auto randomSeed(std::chrono::system_clock::now().time_since_epoch().count());
-    std::mt19937 randomEngine{randomSeed};
+    std::mt19937 randomEngine(randomSeed);
 
     int randomInt(int exclusiveMax) noexcept
     {
@@ -211,7 +211,6 @@ void Game::moveTiles() noexcept
     auto gridSize(static_cast<int>(m_Grid.getSize()));
     auto dirX(m_MoveDirection.x);
     auto dirY(m_MoveDirection.y);
-    int col, row;
 
     // Loop through grid (based on direction of user input)
     // Explanation:

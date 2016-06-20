@@ -14,23 +14,16 @@ class Tile : public sf::Drawable, public sf::Transformable
     friend class TileManager;
 
 public:
-    Tile(Assets& assets, int value = 2) noexcept;
+    explicit Tile(Assets& assets, int value = 2) noexcept;
 
     int getValue() const noexcept;
     int increaseValue() noexcept;
     void setValue(int value) noexcept;
 
-    template <typename TTask, typename... TArgs>
-    void addTask(TArgs&&... args)
+    template <typename TTask>
+    void addTask(float start, float end, float duration, BaseTask::UpdateFunc updateFunc, BaseTask::CompleteFunc compeleteFunc = nullptr)
     {
-        TTask task{FWD(args)...};
-        m_Tasks.push(task);
-    }
-
-    template <typename TTask, typename... TArgs>
-    void addTask(TArgs&&... args, Func<void()> onCompleted)
-    {
-        TTask task{FWD(args)..., onCompleted};
+        TTask task{start, end, duration, updateFunc, compeleteFunc};
         m_Tasks.push(task);
     }
 
